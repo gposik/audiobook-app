@@ -1,11 +1,13 @@
+from tokenize import Token
 from flask import Flask, jsonify
 from flask_restful import Api
-# from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager
 from marshmallow import ValidationError
 
 from ma import ma
 from db import db
 from blacklist import BLACKLIST
+from resources.user import User, UserLogin, UserRegister, UserLogout, TokenRefresh
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
@@ -30,13 +32,20 @@ def handle_marshmallow_validation(err):  # except ValidationError as err
     return jsonify(err.messages), 400
 
 
-# jwt = JWTManager(app)
+jwt = JWTManager(app)
 
 
 # This method will check if a token is blacklisted, and will be called automatically when blacklist is enabled
-# @jwt.token_in_blocklist_loader
-# def check_if_token_in_blacklist(jwt_header, jwt_payload):
-#     return jwt_payload["jti"] in BLACKLIST
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blacklist(jwt_header, jwt_payload):
+    return jwt_payload["jti"] in BLACKLIST
+
+
+api.add_resource(User, "/users/<int:user_id>")
+api.add_resource(UserRegister, "/register")
+api.add_resource(UserLogin, "/login")
+api.add_resource(UserLogout, "/logout")
+api.add_resource(TokenRefresh, "/refresh")
 
 
 if __name__ == "__main__":
