@@ -1,4 +1,3 @@
-from tokenize import Token
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
@@ -7,6 +6,7 @@ from marshmallow import ValidationError
 from ma import ma
 from db import db
 from blacklist import BLACKLIST
+from errors import error_bp
 from resources.user import User, UserLogin, UserRegister, UserLogout, TokenRefresh
 
 app = Flask(__name__)
@@ -19,17 +19,15 @@ app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = [
     "refresh",
 ]  # allow blacklisting for access and refresh tokens
 app.secret_key = "LOLoTech92"  # could do app.config['JWT_SECRET_KEY'] if we prefer
+
+app.register_blueprint(error_bp)
+
 api = Api(app)
 
 
 @app.before_first_request
 def create_tables():
     db.create_all()
-
-
-@app.errorhandler(ValidationError)
-def handle_marshmallow_validation(err):  # except ValidationError as err
-    return jsonify(err.messages), 400
 
 
 jwt = JWTManager(app)

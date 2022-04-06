@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     get_jwt,
 )
 from models.user import UserModel
-from schemas.user import UserSchema
+from schemas.user import UserSchema, UserLoginSchema, UserRegisterSchema
 from blacklist import BLACKLIST
 
 USER_ALREADY_EXISTS = "A user with that username already exists."
@@ -19,13 +19,15 @@ INVALID_CREDENTIALS = "Invalid credentials!"
 USER_LOGGED_OUT = "User <id={}> successfully logged out."
 
 user_schema = UserSchema()
+user_login_schema = UserLoginSchema()
+user_register_schema = UserRegisterSchema()
 
 
 class UserRegister(Resource):
     @classmethod
     def post(cls):
         user_json = request.get_json()
-        user = user_schema.load(user_json)
+        user = user_register_schema.load(user_json)
 
         if UserModel.find_by_username(user.username):
             return {"message": USER_ALREADY_EXISTS}, 400
@@ -61,12 +63,12 @@ class UserLogin(Resource):
     @classmethod
     def post(cls):
         user_json = request.get_json()
-        user_data = user_schema.load(user_json)
+        user_data = user_login_schema.load(user_json)
 
-        user = UserModel.find_by_username(user_data.username)
+        user = UserModel.find_by_username(user_data["username"])
 
         # this is what the `authenticate()` function did in security.py
-        if user and (user.password == user_data.password):
+        if user and (user.password == user_data["password"]):
             # identity= is what the identity() function did in security.py—now stored in the JWT
             access_token = create_access_token(identity=user.id, fresh=True)
             refresh_token = create_refresh_token(user.id)
