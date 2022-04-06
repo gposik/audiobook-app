@@ -1,16 +1,17 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
-from marshmallow import ValidationError
 
 from ma import ma
 from db import db
 from blacklist import BLACKLIST
 from errors import error_bp
+from resources.task import Task, TaskList
 from resources.user import User, UserLogin, UserRegister, UserLogout, TokenRefresh
+from resources.audiobook import Audiobook, AudiobookList
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.sqlite"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["PROPAGATE_EXCEPTIONS"] = True
 app.config["JWT_BLACKLIST_ENABLED"] = True  # enable blacklist feature
@@ -44,7 +45,10 @@ api.add_resource(UserRegister, "/register")
 api.add_resource(UserLogin, "/login")
 api.add_resource(UserLogout, "/logout")
 api.add_resource(TokenRefresh, "/refresh")
-
+api.add_resource(Audiobook, "/audiobook/<int:audiobook_id>", "/audiobook")
+api.add_resource(AudiobookList, "/audiobooks")
+api.add_resource(Task, "/task/<int:task_id>", "/task")
+api.add_resource(TaskList, "/tasks")
 
 if __name__ == "__main__":
     db.init_app(app)

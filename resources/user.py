@@ -10,13 +10,12 @@ from flask_jwt_extended import (
 from models.user import UserModel
 from schemas.user import UserSchema, UserLoginSchema, UserRegisterSchema
 from blacklist import BLACKLIST
+from config import *
 
-USER_ALREADY_EXISTS = "A user with that username already exists."
-CREATED_SUCCESSFULLY = "User created successfully."
-USER_NOT_FOUND = "User not found."
-USER_DELETED = "User deleted."
 INVALID_CREDENTIALS = "Invalid credentials!"
 USER_LOGGED_OUT = "User <id={}> successfully logged out."
+RESOURCE_NAME = "User"
+
 
 user_schema = UserSchema()
 user_login_schema = UserLoginSchema()
@@ -30,11 +29,11 @@ class UserRegister(Resource):
         user = user_register_schema.load(user_json)
 
         if UserModel.find_by_username(user.username):
-            return {"message": USER_ALREADY_EXISTS}, 400
+            return {"message": ALREADY_EXISTS.format(RESOURCE_NAME, "username")}, 400
 
         user.save_to_db()
 
-        return {"message": CREATED_SUCCESSFULLY}, 201
+        return {"message": CREATED_SUCCESSFULLY.format(RESOURCE_NAME)}, 201
 
 
 class User(Resource):
@@ -47,16 +46,16 @@ class User(Resource):
     def get(cls, user_id: int):
         user = UserModel.find_by_id(user_id)
         if not user:
-            return {"message": USER_NOT_FOUND}, 404
+            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
         return user_schema.dump(user), 200
 
     @classmethod
     def delete(cls, user_id: int):
         user = UserModel.find_by_id(user_id)
         if not user:
-            return {"message": USER_NOT_FOUND}, 404
+            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
         user.delete_from_db()
-        return {"message": USER_DELETED}, 200
+        return {"message": DELETED.format(RESOURCE_NAME)}, 200
 
 
 class UserLogin(Resource):
