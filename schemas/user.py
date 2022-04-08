@@ -9,6 +9,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         model = UserModel
         load_only = ("password",)
         dump_only = ("id",)
+        include_fk = True
         load_instance = True
 
 

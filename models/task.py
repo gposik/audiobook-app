@@ -17,6 +17,7 @@ class TaskModel(Timestamp, db.Model):
     audiobook = db.relationship(
         "AudiobookModel", backref=backref("task", uselist=False)
     )
+    subtasks = db.relationship("SubtaskModel")
 
     def __repr__(self):
         return f"Task <id:{self.id}>"
@@ -32,6 +33,9 @@ class TaskModel(Timestamp, db.Model):
     @classmethod
     def find_all(cls) -> List["TaskModel"]:
         return cls.query.all()
+
+    def get_available_subtasks(self):
+        return [s for s in self.subtasks if not s.is_completed]
 
     def save_to_db(self) -> "None":
         db.session.add(self)

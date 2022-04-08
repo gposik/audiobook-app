@@ -8,6 +8,7 @@ from flask_jwt_extended import (
     get_jwt,
 )
 from models.user import UserModel
+from schemas.subtask import SubtaskSchema
 from schemas.user import UserSchema, UserLoginSchema, UserRegisterSchema
 from blacklist import BLACKLIST
 from config import *
@@ -16,10 +17,14 @@ INVALID_CREDENTIALS = "Invalid credentials!"
 USER_LOGGED_OUT = "User <id={}> successfully logged out."
 RESOURCE_NAME = "User"
 
+TASK_ASSIGNED_SUCCESSFULLY = "The task was successfully assigned"
+NOT_CURRENT_TASK = "This user has no task assigned"
 
 user_schema = UserSchema()
 user_login_schema = UserLoginSchema()
 user_register_schema = UserRegisterSchema()
+
+subtask_schema = SubtaskSchema()
 
 
 class UserRegister(Resource):
@@ -28,8 +33,12 @@ class UserRegister(Resource):
         user_json = request.get_json()
         user = user_register_schema.load(user_json)
 
-        if UserModel.find_by_username(user.username):
-            return {"message": ALREADY_EXISTS.format(RESOURCE_NAME, "username")}, 400
+        if UserModel.find_by_username(user.username) or UserModel.find_by_email(
+            user.email
+        ):
+            return {
+                "message": ALREADY_EXISTS.format(RESOURCE_NAME, "username or email")
+            }, 400
 
         user.save_to_db()
 
@@ -93,3 +102,28 @@ class TokenRefresh(Resource):
         current_user = get_jwt_identity()
         new_token = create_access_token(identity=current_user, fresh=False)
         return {"access_token": new_token}, 200
+
+
+class UserSubtask(Resource):
+    @classmethod
+    def get(cls, user_id):
+        user = UserModel.find_by_id(user_id)
+        if not user:
+            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+
+        subtask = user.get_current_subtask()
+        if not subtask:
+            return {"message": NOT_CURRENT_TASK}, 404
+
+        return subtask_schema.dump(subtask), 200
+
+    @classmethod
+    def post(cls, user_id, subtask_id):
+        user = UserModel.find_by_id(user_id)
+        if not user:
+            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+        user.subtask_id = subtask_id
+
+        user.save_to_db()
+
+        return {"message": TASK_ASSIGNED_SUCCESSFULLY}, 200

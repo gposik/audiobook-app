@@ -6,8 +6,16 @@ from ma import ma
 from db import db
 from blacklist import BLACKLIST
 from errors import error_bp
+from resources.subtask import TaskSubtask
 from resources.task import Task, TaskList
-from resources.user import User, UserLogin, UserRegister, UserLogout, TokenRefresh
+from resources.user import (
+    User,
+    UserLogin,
+    UserRegister,
+    UserLogout,
+    TokenRefresh,
+    UserSubtask,
+)
 from resources.audiobook import Audiobook, AudiobookList
 
 app = Flask(__name__)
@@ -41,6 +49,11 @@ def check_if_token_in_blacklist(jwt_header, jwt_payload):
 
 
 api.add_resource(User, "/users/<int:user_id>")
+api.add_resource(
+    UserSubtask,
+    "/user/<int:user_id>/subtask",
+    "/user/<int:user_id>/subtask/<int:subtask_id>",
+)
 api.add_resource(UserRegister, "/register")
 api.add_resource(UserLogin, "/login")
 api.add_resource(UserLogout, "/logout")
@@ -49,6 +62,12 @@ api.add_resource(Audiobook, "/audiobook/<int:audiobook_id>", "/audiobook")
 api.add_resource(AudiobookList, "/audiobooks")
 api.add_resource(Task, "/task/<int:task_id>", "/task")
 api.add_resource(TaskList, "/tasks")
+api.add_resource(
+    TaskSubtask,
+    "/task/<int:task_id>/subtask/<int:subtask_id>",
+    "/task/<int:task_id>/subtask",
+)
+
 
 if __name__ == "__main__":
     db.init_app(app)
