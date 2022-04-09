@@ -6,7 +6,7 @@ from ma import ma
 from db import db
 from blacklist import BLACKLIST
 from errors import error_bp
-from resources.subtask import TaskSubtask
+from resources.subtask import TaskSubtask, TaskSubtaskList
 from resources.task import Task, TaskList
 from resources.user import (
     User,
@@ -67,6 +67,7 @@ api.add_resource(
     "/task/<int:task_id>/subtask/<int:subtask_id>",
     "/task/<int:task_id>/subtask",
 )
+api.add_resource(TaskSubtaskList, "/task/<int:task_id>/subtasks")
 
 
 if __name__ == "__main__":

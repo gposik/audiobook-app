@@ -1,7 +1,8 @@
 from typing import List
 from db import db
-from models.timestamp import Timestamp
+from models.subtask import SubtaskModel
 from models.audiobook import AudiobookModel
+from models.timestamp import Timestamp
 from sqlalchemy.orm import backref
 
 
@@ -34,8 +35,11 @@ class TaskModel(Timestamp, db.Model):
     def find_all(cls) -> List["TaskModel"]:
         return cls.query.all()
 
-    def get_available_subtasks(self):
-        return [s for s in self.subtasks if not s.is_completed]
+    def get_available_subtasks(self) -> List["SubtaskModel"]:
+        return SubtaskModel.query.filter_by(is_completed=False, task_id=self.id).all()
+
+    def get_subtask_by_id(self, subtask_id) -> "SubtaskModel":
+        return next((x for x in self.subtasks if x.id == subtask_id), None)
 
     def save_to_db(self) -> "None":
         db.session.add(self)

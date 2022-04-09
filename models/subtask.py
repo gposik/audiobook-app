@@ -1,5 +1,3 @@
-from email.policy import default
-from typing import List
 from db import db
 from models.timestamp import Timestamp
 
@@ -18,10 +16,6 @@ class SubtaskModel(Timestamp, db.Model):
     @classmethod
     def find_by_id(cls, _id: int) -> "SubtaskModel":
         return cls.query.filter_by(id=_id).first()
-
-    @classmethod
-    def find_by_task_id(cls, _task_id: int, _id: int) -> "SubtaskModel":
-        return cls.query.filter_by(task_id=_task_id, id=_id).first()
 
     def save_to_db(self) -> "None":
         db.session.add(self)
