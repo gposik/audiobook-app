@@ -1,11 +1,11 @@
 from db import db
+from models.base import BaseModel
 from models.subtask import SubtaskModel
 
 
-class UserModel(db.Model):
+class UserModel(BaseModel):
     __tablename__ = "users"
 
-    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(80), nullable=False, unique=True)
@@ -13,10 +13,6 @@ class UserModel(db.Model):
 
     def __repr__(self):
         return f"User {self.username}"
-
-    @classmethod
-    def find_by_id(cls, _id: int) -> "UserModel":
-        return cls.query.filter_by(id=_id).first()
 
     @classmethod
     def find_by_username(cls, username: str) -> "UserModel":
@@ -28,11 +24,3 @@ class UserModel(db.Model):
 
     def get_current_subtask(self) -> "SubtaskModel":
         return SubtaskModel.query.filter_by(id=self.subtask_id).first()
-
-    def save_to_db(self) -> "None":
-        db.session.add(self)
-        db.session.commit()
-
-    def delete_from_db(self) -> "None":
-        db.session.delete(self)
-        db.session.commit()
