@@ -8,7 +8,7 @@ class AudiobookModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False, unique=True)
     author = db.Column(db.String(80), nullable=False)
-    pdf_file = db.Column(db.LargeBinary, unique=True)  # nullable=False
+    book_file = db.Column(db.String(80), unique=True)  # nullable=False
     audio_file = db.Column(db.LargeBinary, unique=True)
 
     def __repr__(self):

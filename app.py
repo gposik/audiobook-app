@@ -1,4 +1,5 @@
-from flask import Flask, jsonify
+import os
+from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
@@ -17,6 +18,9 @@ from resources.user import (
     UserSubtask,
 )
 from resources.audiobook import Audiobook, AudiobookList
+from resources.file import File
+
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.sqlite"
@@ -28,6 +32,15 @@ app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = [
     "refresh",
 ]  # allow blacklisting for access and refresh tokens
 app.secret_key = "LOLoTech92"  # could do app.config['JWT_SECRET_KEY'] if we prefer
+
+app.config["UPLOAD_FOLDER"] = os.path.join(basedir, "static/uploads/")
+app.config["ALLOWED_EXTENSIONS"] = set(
+    ["png", "jpg", "jpeg", "gif", "svg", "bmp", "pdf"]
+)
+app.config["ALLOWED_MIMETYPES_EXTENSIONS"] = set(
+    ["image/apng", "image/bmp", "image/jpeg", "image/png", "image/svg+xml"]
+)
+app.config["MAX_CONTENT_LENGTH"] = 4 * 1024 * 1024
 
 app.register_blueprint(error_bp)
 
@@ -68,7 +81,7 @@ api.add_resource(
     "/task/<int:task_id>/subtask",
 )
 api.add_resource(TaskSubtaskList, "/task/<int:task_id>/subtasks")
-
+api.add_resource(File, "/upload-file", "/download-file")
 
 if __name__ == "__main__":
     db.init_app(app)
