@@ -5,6 +5,7 @@ from flask_jwt_extended import JWTManager
 
 from ma import ma
 from db import db
+from config import env_config
 from blacklist import BLACKLIST
 from errors import error_bp
 from resources.subtask import TaskSubtask, TaskSubtaskList
@@ -23,24 +24,8 @@ from resources.file import File
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.sqlite"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["PROPAGATE_EXCEPTIONS"] = True
-app.config["JWT_BLACKLIST_ENABLED"] = True  # enable blacklist feature
-app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = [
-    "access",
-    "refresh",
-]  # allow blacklisting for access and refresh tokens
-app.secret_key = "LOLoTech92"  # could do app.config['JWT_SECRET_KEY'] if we prefer
 
-app.config["UPLOAD_FOLDER"] = os.path.join(basedir, "static/uploads/")
-app.config["ALLOWED_EXTENSIONS"] = set(
-    ["png", "jpg", "jpeg", "gif", "svg", "bmp", "pdf"]
-)
-app.config["ALLOWED_MIMETYPES_EXTENSIONS"] = set(
-    ["image/apng", "image/bmp", "image/jpeg", "image/png", "image/svg+xml"]
-)
-app.config["MAX_CONTENT_LENGTH"] = 4 * 1024 * 1024
+app.config.from_object(env_config["development"])
 
 app.register_blueprint(error_bp)
 
