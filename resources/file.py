@@ -1,7 +1,7 @@
 import os
 
 from flask_restful import Resource
-from flask import current_app, request
+from flask import current_app as app, request
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from schemas.file import FileQuerySchema, FileSchema
@@ -13,14 +13,13 @@ file_schema = FileSchema()
 def allowed_file(filename):
     return (
         "." in filename
-        and filename.rsplit(".", 1)[1].lower()
-        in current_app.config["ALLOWED_EXTENSIONS"]
+        and filename.rsplit(".", 1)[1].lower() in app.config["ALLOWED_EXTENSIONS"]
     )
 
 
 def mimetype_check_passes(uploaded_file):
     mimetype = uploaded_file.content_type
-    return mimetype in current_app.config["ALLOWED_MIMETYPES_EXTENSIONS"]
+    return mimetype in app.config["ALLOWED_MIMETYPES_EXTENSIONS"]
 
 
 class File(Resource):
@@ -38,9 +37,7 @@ class File(Resource):
             # Make the filename safe, remove unsupported chars
             uploaded_file.filename = secure_filename(name)
 
-            target = os.path.join(
-                current_app.config["UPLOAD_FOLDER"], uploaded_file.filename
-            )
+            target = os.path.join(app.config["UPLOAD_FOLDER"], uploaded_file.filename)
 
             uploaded_file.save(target)
             return ({"message": "File uploaded successfully"}), 201
@@ -49,6 +46,16 @@ class File(Resource):
 
     @classmethod
     def get(cls):
+        """
+        >>> get('http://localhost:5000/download-file?name=2-cc650e88-e77d-437d-b761-824627d56926.pdf', headers={"accept":"application/json"}).content
+        {
+            "directory": "/home/gaston/Proyectos/audiobook-app/static/uploads/",
+            "filename": "2-cc650e88-e77d-437d-b761-824627d56926.pdf"
+        }
+        >>> get('http://localhost:5000/download-file?name=2-cc650e88-e77d-437d-b761-824627d56926.pdf', headers={"accept":"application/octet-stream"}).content
+        '<PDF>'
+        """
+
         query_params = file_query_schema.load(request.args)
-        name = query_params["name"]
-        pass
+        filename = query_params["name"]
+        return {"directory": app.config["UPLOAD_FOLDER"], "filename": filename}

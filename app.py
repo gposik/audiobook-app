@@ -1,7 +1,8 @@
 import os
-from flask import Flask
+from flask import Flask, send_file
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
+from werkzeug.security import safe_join
 
 from ma import ma
 from db import db
@@ -30,6 +31,19 @@ app.config.from_object(env_config["development"])
 app.register_blueprint(error_bp)
 
 api = Api(app)
+
+
+@api.representation("application/octet-stream")
+def output_file(data, code, headers):
+    filepath = safe_join(data["directory"], data["filename"])
+
+    response = send_file(
+        path_or_file=filepath,
+        mimetype="application/octet-stream",
+        as_attachment=True,
+        attachment_filename=data["filename"],
+    )
+    return response
 
 
 @app.before_first_request
