@@ -2,7 +2,9 @@ from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import jwt_required
 from config import ALREADY_EXISTS, CREATED_SUCCESSFULLY, NOT_FOUND
+from models.subtask import SubtaskModel
 from models.task import TaskModel
+from schemas.subtask import SubtaskSchema
 from schemas.task import TaskSchema
 
 RESOURCE_NAME = "Task"
@@ -28,6 +30,11 @@ class Task(Resource):
             return {
                 "message": ALREADY_EXISTS.format(RESOURCE_NAME, "audiobook_id")
             }, 400
+
+        # Leer texto de task.audiobook
+        # Por cada fragment obtener el pedazo de texto
+        # Instanciar un subtask con task_id y fragmento (usar load schema?)
+        # Guardarlo en la base
 
         task.save_to_db()
 

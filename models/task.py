@@ -19,6 +19,7 @@ class TaskModel(Timestamp, BaseModel):
         "AudiobookModel", backref=backref("task", uselist=False)
     )
     subtasks = db.relationship("SubtaskModel")
+    fragments = []
 
     def __repr__(self):
         return f"Task <id:{self.id}>"
