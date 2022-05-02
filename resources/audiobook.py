@@ -36,7 +36,7 @@ class Audiobook(Resource):
         else:
             new_id = 1
 
-        audiobook.book_file = f"{new_id}-{str(uuid.uuid4())}.pdf"
+        audiobook.book_file = f"{new_id}-{str(uuid.uuid4())}"
 
         audiobook.save_to_db()
 

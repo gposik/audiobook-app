@@ -11,6 +11,8 @@ marshmallow = "*"
 flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
 flask-jwt-extended = "*"
+mobi = "*"
+html2text = "*"
 
 [dev-packages]
 black = "*"

@@ -12,7 +12,7 @@ class Config:
     JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
     JWT_ACCESS_TOKEN_EXPIRES = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", 14400))
     UPLOAD_FOLDER = os.path.join(basedir, "static/uploads/")
-    ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif", "svg", "bmp", "pdf"])
+    ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif", "svg", "bmp", "pdf", "mobi"])
     ALLOWED_MIMETYPES_EXTENSIONS = set(
         ["image/apng", "image/bmp", "image/jpeg", "image/png", "image/svg+xml"]
     )
