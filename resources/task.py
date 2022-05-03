@@ -39,7 +39,7 @@ class Task(Resource):
         task = task_schema.load(task_json)
 
         if not AudiobookModel.find_by_id(task.audiobook_id):
-            return {"message": "The audiobook_id entered does not exists"}, 400
+            return {"message": "the audiobook_id entered does not exist."}, 404
 
         if TaskModel.find_by_audiobook_id(task.audiobook_id):
             return {
@@ -48,28 +48,30 @@ class Task(Resource):
 
         task.save_to_db()
 
-        # Ordenar los fragmentos
-        sorted_fragments = sorted(task.fragments, key=lambda i: i["first_line"])
-
         # Obtener filepath
         file_path = os.path.join(app.config["UPLOAD_FOLDER"], task.audiobook.book_file)
-
         # Obtener texto de archivo .mobi
-        text = get_text_from_mobi_file(file_path)
+        try:
+            book_text = get_text_from_mobi_file(file_path)
+        except FileNotFoundError:
+            task.delete_from_db()
+            return {"error": "the book file does not exist."}, 404
 
-        # Iterar sobre los rangos para obter los fragmentos e instanciar las subtaks
-        iter_text = StringIO(text)
+        # Ordenar los fragmentos
+        sorted_fragments = sorted(task.fragments, key=lambda i: i["first_line"])
+        # Iterar sobre los rangos, obtener los fragmentos e instanciar las subtaks
+        book_iter = StringIO(book_text)
         last = 0
         for fragment in sorted_fragments:
             init = fragment["first_line"]
             finish = fragment["last_line"]
 
             for _ in range(last, init):
-                next(iter_text)
+                next(book_iter)
 
             frg = ""
             for _ in range(init, finish + 1):
-                frg += iter_text.readline()
+                frg += book_iter.readline()
 
             last = finish
 

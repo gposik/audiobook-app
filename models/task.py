@@ -10,7 +10,6 @@ from sqlalchemy.orm import backref
 class TaskModel(Timestamp, BaseModel):
     __tablename__ = "tasks"
 
-    collaborators_number = db.Column(db.Integer, nullable=False)
     is_completed = db.Column(db.Boolean, default=False)
     audiobook_id = db.Column(
         db.Integer, db.ForeignKey("audiobooks.id"), nullable=False, unique=True

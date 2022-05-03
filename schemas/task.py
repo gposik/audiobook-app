@@ -12,19 +12,15 @@ from marshmallow import (
 )
 
 
-def range_including_end(start, end):
-    return range(start, end + 1)
-
-
 def is_positive(value):
+    if value <= 0:
+        raise ValidationError("Value should be greater than zero.")
     return value > 0
 
 
 class FragmentSchema(Schema):
-    first_line = fields.Int(
-        required=True, validate=validate.And(validate.Range(min=0), is_positive)
-    )
-    last_line = fields.Int(required=True, validate=validate.Range(min=0))
+    first_line = fields.Int(required=True, validate=is_positive)
+    last_line = fields.Int(required=True, validate=is_positive)
 
     @validates_schema
     def validate_numbers(self, data, **kwargs):
@@ -49,22 +45,22 @@ class TaskSchema(ma.SQLAlchemyAutoSchema):
 
     @validates("fragments")
     def validate_fragments(self, fragments):
+        fragments_schema = FragmentSchema(many=True)
+        valid_fragments = fragments_schema.load(fragments)
+
         ranges = []
-        for fragment in fragments:
-            try:
-                a = int(fragment["first_line"])
-                b = int(fragment["last_line"])
-            except ValueError:
-                print("Lines should be integer.")
-            for r in ranges:
-                if a in r or b in r:
+        for fragment in valid_fragments:
+            first_line = fragment["first_line"]
+            last_line = fragment["last_line"]
+            for rnge in ranges:
+                if first_line in rnge or last_line in rnge:
                     raise ValidationError(
                         {
                             "fragment": fragment,
-                            "error": "range cannot be included in another range",
+                            "error": "The range cannot be included in another range.",
                         }
                     )
-            ranges.append(list(range_including_end(a, b)))
+            ranges.append(list(range(first_line, last_line + 1)))
 
 
 # class TaskSchema2(Schema):
@@ -79,22 +75,6 @@ class TaskSchema(ma.SQLAlchemyAutoSchema):
 #         load_only=True,
 #         validate=validate.Length(min=1),
 #     )
-
-#     @validates("fragments")
-#     def validate_fragments(self, fragments):
-#         ranges = []
-#         for fragment in fragments:
-#             a = fragment["first_line"]
-#             b = fragment["last_line"]
-#             for r in ranges:
-#                 if a in r or b in r:
-#                     raise ValidationError(
-#                         {
-#                             "fragment": fragment,
-#                             "error": "range cannot be included in another range",
-#                         }
-#                     )
-#             ranges.append(list(range1(a, b)))
 
 #     @post_load
 #     def make_task(self, data, **kwargs):
