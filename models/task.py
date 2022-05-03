@@ -15,7 +15,8 @@ class TaskModel(Timestamp, BaseModel):
         db.Integer, db.ForeignKey("audiobooks.id"), nullable=False, unique=True
     )
     audiobook = db.relationship(
-        "AudiobookModel", backref=backref("task", uselist=False)
+        "AudiobookModel",
+        backref=backref("task", uselist=False, cascade="all, delete-orphan"),
     )
     subtasks = db.relationship("SubtaskModel")
     fragments = []

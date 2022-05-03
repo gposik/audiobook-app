@@ -4,6 +4,7 @@ from flask import request
 from flask_jwt_extended import jwt_required
 from sqlalchemy import text
 from models.audiobook import AudiobookModel
+from models.task import TaskModel
 from schemas.audiobook import AudiobookSchema
 
 from config import *
@@ -44,6 +45,15 @@ class Audiobook(Resource):
             "message": CREATED_SUCCESSFULLY.format(RESOURCE_NAME),
             "audiobook": audiobook_schema.dump(audiobook),
         }, 201
+
+    @classmethod
+    def delete(cls, audiobook_id):
+        audiobook = AudiobookModel.find_by_id(audiobook_id)
+        if not audiobook:
+            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+
+        audiobook.delete_from_db()
+        return {"message": DELETED.format(RESOURCE_NAME)}, 204
 
 
 class AudiobookList(Resource):
