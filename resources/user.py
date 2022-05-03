@@ -9,14 +9,19 @@ from flask_jwt_extended import (
 )
 from models.user import UserModel
 from schemas.subtask import SubtaskSchema
-from schemas.user import UserSchema, UserLoginSchema, UserRegisterSchema
+from schemas.user import (
+    UserSchema,
+    UserLoginSchema,
+    UserRegisterSchema,
+    UserSubtaskPathSchema,
+)
 from blacklist import BLACKLIST
-from config import *
+from config import ALREADY_EXISTS, CREATED_SUCCESSFULLY, NOT_FOUND, DELETED
+from utils.APIUtils import request_schemas_load
 
 INVALID_CREDENTIALS = "Invalid credentials!"
 USER_LOGGED_OUT = "User <id={}> successfully logged out."
 RESOURCE_NAME = "User"
-
 TASK_ASSIGNED_SUCCESSFULLY = "The task was successfully assigned"
 NOT_CURRENT_TASK = "This user has no task assigned"
 
@@ -119,9 +124,13 @@ class UserSubtask(Resource):
 
     @classmethod
     def post(cls, user_id, subtask_id):
-        user = UserModel.find_by_id(user_id)
-        if not user:
-            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+        result = request_schemas_load([UserSubtaskPathSchema()])
+
+        user = UserModel.find_by_id_or_404(user_id)
+
+        # user = UserModel.find_by_id(user_id)
+        # if not user:
+        #     return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
         user.subtask_id = subtask_id
 
         user.save_to_db()

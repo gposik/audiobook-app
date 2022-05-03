@@ -6,6 +6,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JSON_SORT_KEYS = False
     PROPAGATE_EXCEPTIONS = True
     JWT_SECRET_KEY = "LOLoTech92"
     JWT_BLACKLIST_ENABLED = True

@@ -5,8 +5,9 @@ from models.timestamp import Timestamp
 
 class SubtaskModel(Timestamp, BaseModel):
     __tablename__ = "subtasks"
+    __model_name__ = "substask"
 
-    fragment = db.Column(db.Text)  # nullable=False
+    fragment = db.Column(db.Text, nullable=False)
     is_completed = db.Column(db.Boolean, default=False)
     task_id = db.Column(db.Integer, db.ForeignKey("tasks.id"), default=None)
 
