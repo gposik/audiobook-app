@@ -11,7 +11,7 @@ from schemas.base import (
 def schema_check(schema=None, json_data=None, title=None):
     # load and validate
     try:
-        return schema.load(data=json_data, partial=True)
+        return schema.load(data=json_data)
 
     except ValidationError as err:
         raise APIError(

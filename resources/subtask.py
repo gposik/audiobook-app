@@ -4,7 +4,8 @@ from flask_jwt_extended import jwt_required
 from config import CREATED_SUCCESSFULLY, NOT_FOUND
 from models.subtask import SubtaskModel
 from models.task import TaskModel
-from schemas.subtask import SubtaskSchema
+from schemas.subtask import SubtaskQuerySchema, SubtaskSchema
+from utils.api_utils import request_schemas_load
 
 RESOURCE_NAME = "Subtask"
 
@@ -42,7 +43,13 @@ class TaskSubtask(Resource):
 class TaskSubtaskList(Resource):
     @classmethod
     def get(cls, task_id):
-        task = TaskModel.find_by_id(task_id)
-        if not task:
-            return {"message": NOT_FOUND.format("Task")}, 404
-        return {"data": subtask_list_schema.dump(task.subtasks)}
+        task = TaskModel.find_by_id_or_404(task_id)
+
+        results = request_schemas_load(SubtaskQuerySchema())
+
+        if results["query"]["is_completed"]:
+            data = [x for x in task.subtasks if x.is_completed]
+        else:
+            data = task.subtasks
+
+        return {"data": subtask_list_schema.dump(data)}

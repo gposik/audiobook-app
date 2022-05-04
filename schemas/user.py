@@ -1,8 +1,16 @@
 import re
 from ma import ma
-from marshmallow import Schema, fields, post_load, validates, ValidationError, validate
+from marshmallow import (
+    INCLUDE,
+    Schema,
+    fields,
+    post_load,
+    validates,
+    ValidationError,
+    validate,
+)
 from models.user import UserModel
-from schemas.base import RequestPathParamsSchema
+from schemas.base import RequestPathParamsSchema, RequestQueryParamsSchema
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):

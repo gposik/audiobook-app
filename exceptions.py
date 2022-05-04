@@ -15,13 +15,16 @@ class InvalidUsage(Exception):
 
 
 class APIError(Exception):
-    def __init__(self, status_code, title, messages, data, valid_data):
+    def __init__(self, status_code, title, messages, data, valid_data=None):
         Exception.__init__(self)
         self.status_code = status_code
         self.title = title
         self.messages = messages
         self.data = data
-        self.valid_data = valid_data
+        if valid_data == None:
+            self.valid_data = {}
+        else:
+            self.valid_data = valid_data
 
     def to_dict(self):
         return dict(

@@ -1,11 +1,12 @@
 from typing import List
+
 from db import db
 from exceptions import APIError
+from utils.string_utils import camel_to_snake
 
 
 class BaseModel(db.Model):
     __abstract__ = True
-    __model_name__ = "base_model"
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -17,18 +18,14 @@ class BaseModel(db.Model):
     def find_by_id_or_404(cls, _id: int) -> "BaseModel":
         obj = cls.query.filter_by(id=_id).first()
         if obj is None:
+            model_name = camel_to_snake(cls.__qualname__)
             raise APIError(
                 status_code=404,
                 title="The requested resource could not be found",
-                messages={
-                    cls.__model_name__: [
-                        "Not found",
-                    ]
-                },
+                messages={model_name: ["Not found"]},
                 data={
-                    "{}_id".format(cls.__model_name__): id,
+                    "{}_id".format(model_name): _id,
                 },
-                valid_data={},
             )
         return obj
 
