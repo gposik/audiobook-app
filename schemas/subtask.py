@@ -18,3 +18,4 @@ class SubtaskQuerySchema(RequestQueryParamsSchema):
         unknown = EXCLUDE
 
     is_completed = fields.Boolean(description="Subtask status.")
+    _id = fields.Int(descrition="Subtask", data_key="id", attribute="id")
