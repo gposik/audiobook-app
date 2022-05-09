@@ -10,3 +10,6 @@ class Timestamp(object):
     creation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     expiration_date = db.Column(db.DateTime, nullable=False, default=tomorrows_date)
     finish_date = db.Column(db.DateTime)
+
+    def is_expired(self):
+        return datetime.utcnow() >= self.expiration_date
