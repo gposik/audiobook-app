@@ -28,6 +28,29 @@ class TaskSubtask(Resource):
         return subtask_schema.dump(subtask), 200
 
     @classmethod
+    def patch(cls, task_id, subtask_id):
+        subtask_json = request.get_json()
+        body = SubtaskSchema(
+            partial=True, load_instance=False, dump_only=("task_id",)
+        ).load(subtask_json)
+
+        if not TaskModel.find_by_id_or_404(task_id):
+            return {"message": NOT_FOUND.format("Task")}, 404
+
+        subtask = SubtaskModel.find_by_id_or_404(subtask_id)
+        if not subtask:
+            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+
+        for key, value in body.items():
+            print(f"key: {key}, value: {value}")
+            if getattr(subtask, key) is not None:
+                setattr(subtask, key, value)
+
+        subtask.save_to_db()
+
+        return subtask_schema.dump(subtask), 200
+
+    @classmethod
     def post(cls, task_id):
         subtask_json = request.get_json()
         subtask = subtask_schema.load(subtask_json)
