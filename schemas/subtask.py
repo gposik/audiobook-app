@@ -1,7 +1,7 @@
 from ma import ma
 from marshmallow import EXCLUDE, fields
 from models.subtask import SubtaskModel
-from schemas.base import RequestBodyParamsSchema, RequestQueryParamsSchema
+from schemas.base import RequestQueryParamsSchema
 
 
 class SubtaskSchema(ma.SQLAlchemyAutoSchema):
@@ -12,10 +12,6 @@ class SubtaskSchema(ma.SQLAlchemyAutoSchema):
         include_fk = True
         load_instance = True
         unknown = EXCLUDE
-
-
-class SubtaskBodySchema(RequestBodyParamsSchema):
-    pass
 
 
 class SubtaskQuerySchema(RequestQueryParamsSchema):

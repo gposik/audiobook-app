@@ -1,5 +1,6 @@
 from flask import request
 from marshmallow import ValidationError
+from ma import ma
 from exceptions import APIError
 from schemas.base import (
     RequestBodyParamsSchema,
@@ -49,7 +50,7 @@ def request_schemas_load(schemas):
                 )
             )
 
-        if isinstance(schema, RequestBodyParamsSchema):
+        if isinstance(schema, (RequestBodyParamsSchema, ma.SQLAlchemyAutoSchema)):
             # body params
             result_body.update(
                 schema_check(

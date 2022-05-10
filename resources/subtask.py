@@ -29,10 +29,17 @@ class TaskSubtask(Resource):
 
     @classmethod
     def patch(cls, task_id, subtask_id):
-        subtask_json = request.get_json()
-        body = SubtaskSchema(
-            partial=True, load_instance=False, dump_only=("task_id",)
-        ).load(subtask_json)
+        results = request_schemas_load(
+            SubtaskSchema(
+                partial=True,
+                load_instance=False,
+                only=(
+                    "fragment",
+                    "is_completed",
+                ),
+            )
+        )
+        body = itemgetter("body")(results)
 
         if not TaskModel.find_by_id_or_404(task_id):
             return {"message": NOT_FOUND.format("Task")}, 404
@@ -42,7 +49,6 @@ class TaskSubtask(Resource):
             return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
 
         for key, value in body.items():
-            print(f"key: {key}, value: {value}")
             if getattr(subtask, key) is not None:
                 setattr(subtask, key, value)
 
