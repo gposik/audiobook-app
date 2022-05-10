@@ -9,6 +9,7 @@ from db import db
 from config import env_config
 from blacklist import BLACKLIST
 from errors import error_bp
+from resources.collaborator import Collaborator, CollaboratorList, CollaboratorSubtask
 from resources.subtask import TaskSubtask, TaskSubtaskList
 from resources.task import Task, TaskList
 from resources.user import (
@@ -17,7 +18,6 @@ from resources.user import (
     UserRegister,
     UserLogout,
     TokenRefresh,
-    UserSubtask,
 )
 from resources.audiobook import Audiobook, AudiobookList
 from resources.file import File
@@ -61,15 +61,17 @@ def check_if_token_in_blacklist(jwt_header, jwt_payload):
 
 
 api.add_resource(User, "/users/<int:user_id>")
-api.add_resource(
-    UserSubtask,
-    "/user/<int:user_id>/subtask",
-    "/user/<int:user_id>/subtask/<int:subtask_id>",
-)
 api.add_resource(UserRegister, "/register")
 api.add_resource(UserLogin, "/login")
 api.add_resource(UserLogout, "/logout")
 api.add_resource(TokenRefresh, "/refresh")
+api.add_resource(CollaboratorList, "/collaborators")
+api.add_resource(Collaborator, "/collaborator/<int:collaborator_id>", "/collaborator")
+api.add_resource(
+    CollaboratorSubtask,
+    "/collaborator/<int:collaborator_id>/subtask",
+    "/collaborator/<int:collaborator_id>/subtask/<int:subtask_id>",
+)
 api.add_resource(Audiobook, "/audiobook/<int:audiobook_id>", "/audiobook")
 api.add_resource(AudiobookList, "/audiobooks")
 api.add_resource(Task, "/task/<int:task_id>", "/task")

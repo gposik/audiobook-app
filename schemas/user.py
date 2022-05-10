@@ -1,16 +1,13 @@
 import re
 from ma import ma
 from marshmallow import (
-    INCLUDE,
     Schema,
     fields,
     post_load,
     validates,
     ValidationError,
-    validate,
 )
 from models.user import UserModel
-from schemas.base import RequestPathParamsSchema, RequestQueryParamsSchema
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
@@ -54,16 +51,3 @@ class UserRegisterSchema(Schema):
 class UserLoginSchema(Schema):
     username = fields.String(required=True)
     password = fields.String(required=True)
-
-
-class UserSubtaskPathSchema(RequestPathParamsSchema):
-    user_id = fields.Int(
-        description="The id of the user.",
-        validate=validate.Range(min=1, max=9999),
-        required=True,
-    )
-    subtask_id = fields.Int(
-        description="The id of the subtask.",
-        validate=validate.Range(min=1, max=9999),
-        required=True,
-    )
