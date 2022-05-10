@@ -35,7 +35,7 @@ class TaskSchema(ma.SQLAlchemyAutoSchema):
         include_fk = True
         load_instance = True
 
-    subtasks = ma.Nested(SubtaskSchema, many=True)
+    subtasks = ma.Nested(SubtaskSchema, many=True, only=("id",))
     fragments = fields.List(
         fields.Nested(FragmentSchema()),
         required=True,
