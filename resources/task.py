@@ -18,7 +18,7 @@ task_schema = TaskSchema()
 task_list_schema = TaskSchema(many=True)
 
 
-def get_text_from_mobi_file(file_path):
+def get_text_from_mobi_file(file_path: str):
     tempdir, filepath = mobi.extract(file_path)
     with open(filepath, "r") as file:
         content = file.read()

@@ -10,7 +10,7 @@ file_query_schema = FileQuerySchema()
 file_schema = FileSchema()
 
 
-def allowed_file(filename):
+def allowed_file(filename: str):
     return (
         "." in filename
         and filename.rsplit(".", 1)[1].lower() in app.config["ALLOWED_EXTENSIONS"]

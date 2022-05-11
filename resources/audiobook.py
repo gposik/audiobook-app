@@ -47,7 +47,7 @@ class Audiobook(Resource):
         }, 201
 
     @classmethod
-    def delete(cls, audiobook_id):
+    def delete(cls, audiobook_id: int):
         audiobook = AudiobookModel.find_by_id(audiobook_id)
         if not audiobook:
             return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404

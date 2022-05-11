@@ -12,7 +12,7 @@ from marshmallow import (
 )
 
 
-def is_positive(value):
+def is_positive(value: int):
     if value <= 0:
         raise ValidationError("Value should be greater than zero.")
     return value > 0
@@ -23,7 +23,7 @@ class FragmentSchema(Schema):
     last_line = fields.Int(required=True, validate=is_positive)
 
     @validates_schema
-    def validate_numbers(self, data, **kwargs):
+    def validate_numbers(self, data: dict, **kwargs):
         if data["first_line"] >= data["last_line"]:
             raise ValidationError("last_line must be greater than first_line")
 
@@ -44,7 +44,7 @@ class TaskSchema(ma.SQLAlchemyAutoSchema):
     )
 
     @validates("fragments")
-    def validate_fragments(self, fragments):
+    def validate_fragments(self, fragments: list):
         fragments_schema = FragmentSchema(many=True)
         valid_fragments = fragments_schema.load(fragments)
 

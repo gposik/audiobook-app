@@ -21,7 +21,7 @@ subtask_schema = SubtaskSchema()
 
 class Collaborator(Resource):
     @classmethod
-    def get(cls, collaborator_id):
+    def get(cls, collaborator_id: int):
         collaborator = CollaboratorModel.find_by_id_or_404(collaborator_id)
         return collaborator_schema.dump(collaborator), 200
 
@@ -52,7 +52,7 @@ class CollaboratorList(Resource):
 
 class CollaboratorSubtask(Resource):
     @classmethod
-    def get(cls, collaborator_id):
+    def get(cls, collaborator_id: int):
         collaborator = CollaboratorModel.find_by_id_or_404(collaborator_id)
 
         subtask = collaborator.get_current_subtask()
@@ -62,7 +62,7 @@ class CollaboratorSubtask(Resource):
         return subtask_schema.dump(subtask), 200
 
     @classmethod
-    def post(cls, collaborator_id, subtask_id):
+    def post(cls, collaborator_id: int, subtask_id: int):
         request_schemas_load([CollaboratorSubtaskPathSchema()])
 
         collaborator = CollaboratorModel.find_by_id_or_404(collaborator_id)

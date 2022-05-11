@@ -16,7 +16,7 @@ subtask_list_schema = SubtaskSchema(many=True)
 
 class TaskSubtask(Resource):
     @classmethod
-    def get(cls, task_id, subtask_id):
+    def get(cls, task_id: int, subtask_id: int):
         task = TaskModel.find_by_id(task_id)
         if not task:
             return {"message": NOT_FOUND.format("Task")}, 404
@@ -28,7 +28,7 @@ class TaskSubtask(Resource):
         return subtask_schema.dump(subtask), 200
 
     @classmethod
-    def patch(cls, task_id, subtask_id):
+    def patch(cls, task_id: int, subtask_id: int):
         results = request_schemas_load(
             SubtaskSchema(
                 partial=True,
@@ -57,7 +57,7 @@ class TaskSubtask(Resource):
         return subtask_schema.dump(subtask), 200
 
     @classmethod
-    def post(cls, task_id):
+    def post(cls, task_id: int):
         subtask_json = request.get_json()
         subtask = subtask_schema.load(subtask_json)
         subtask.task_id = task_id
@@ -72,7 +72,7 @@ class TaskSubtask(Resource):
 
 class TaskSubtaskList(Resource):
     @classmethod
-    def get(cls, task_id):
+    def get(cls, task_id: int):
         task = TaskModel.find_by_id_or_404(task_id)
 
         results = request_schemas_load(SubtaskQuerySchema())
