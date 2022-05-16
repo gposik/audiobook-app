@@ -13,6 +13,7 @@ marshmallow-sqlalchemy = "*"
 flask-jwt-extended = "*"
 mobi = "*"
 html2text = "*"
+requests = "*"
 
 [dev-packages]
 black = "*"

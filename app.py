@@ -18,6 +18,7 @@ from resources.user import (
     UserRegister,
     UserLogout,
     TokenRefresh,
+    UserConfirm,
 )
 from resources.audiobook import Audiobook, AudiobookList
 from resources.file import File
@@ -65,6 +66,7 @@ api.add_resource(UserRegister, "/register")
 api.add_resource(UserLogin, "/login")
 api.add_resource(UserLogout, "/logout")
 api.add_resource(TokenRefresh, "/refresh")
+api.add_resource(UserConfirm, "/user-confirm/<int:user_id>")
 api.add_resource(CollaboratorList, "/collaborators")
 api.add_resource(Collaborator, "/collaborator/<int:collaborator_id>", "/collaborator")
 api.add_resource(

@@ -1,12 +1,6 @@
 import re
 from ma import ma
-from marshmallow import (
-    Schema,
-    fields,
-    post_load,
-    validates,
-    ValidationError,
-)
+from marshmallow import validates, ValidationError
 from models.user import UserModel
 
 
@@ -14,19 +8,9 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = UserModel
         load_only = ("password",)
-        dump_only = ("id",)
+        dump_only = ("id", "activated")
         include_fk = True
         load_instance = True
-
-
-class UserRegisterSchema(Schema):
-    username = fields.String(required=True)
-    password = fields.String(required=True)
-    email = fields.String(required=True)
-
-    @post_load
-    def make_user(self, in_data, **kwargs):
-        return UserModel(**in_data)
 
     @validates("password")
     def validate_password(self, value):
@@ -46,8 +30,3 @@ class UserRegisterSchema(Schema):
         email_format = "^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$"
         if not re.match(email_format, value):
             raise ValidationError("Email format is not valid")
-
-
-class UserLoginSchema(Schema):
-    username = fields.String(required=True)
-    password = fields.String(required=True)
