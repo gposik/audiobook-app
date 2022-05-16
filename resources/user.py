@@ -1,4 +1,5 @@
 import traceback
+from db import db
 from flask_restful import Resource
 from flask import request, make_response, render_template
 from flask_jwt_extended import (
@@ -15,6 +16,7 @@ from config import (
     DELETED,
     FAILED_TO_CREATE,
 )
+from libs.mailgun import MailgunException
 from models.user import UserModel
 from schemas.user import UserSchema
 
@@ -46,6 +48,9 @@ class UserRegister(Resource):
             user.save_to_db()
             user.send_confirmation_email()
             return {"message": SUCCESS_REGISTER_MESSAGE}, 201
+        except MailgunException as e:
+            db.session.rollback()
+            return {"message": e.messages}, 500
         except:
             traceback.print_exc()
             return {"message": FAILED_TO_CREATE.format(RESOURCE_NAME)}, 500
