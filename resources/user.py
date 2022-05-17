@@ -1,7 +1,7 @@
 import traceback
 from db import db
 from flask_restful import Resource
-from flask import request, make_response, render_template
+from flask import request
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -46,7 +46,7 @@ class UserRegister(Resource):
 
         try:
             user.save_to_db()
-            user.send_confirmation_email()
+            # user.send_confirmation_email()
             return {"message": SUCCESS_REGISTER_MESSAGE}, 201
         except MailgunException as e:
             db.session.rollback()
@@ -117,15 +117,3 @@ class TokenRefresh(Resource):
         current_user = get_jwt_identity()
         new_token = create_access_token(identity=current_user, fresh=False)
         return {"access_token": new_token}, 200
-
-
-class UserConfirm(Resource):
-    @classmethod
-    def get(cls, user_id: int):
-        user = UserModel.find_by_id_or_404(user_id)
-        user.activated = True
-        user.save_to_db()
-        headers = {"Content-Type": "text/html"}
-        return make_response(
-            render_template("confirmation_page.html", email=user.email), 200, headers
-        )

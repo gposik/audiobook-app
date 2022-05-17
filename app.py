@@ -1,4 +1,5 @@
 import os
+
 from flask import Flask, send_file
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
@@ -12,14 +13,8 @@ from errors import error_bp
 from resources.collaborator import Collaborator, CollaboratorList, CollaboratorSubtask
 from resources.subtask import TaskSubtask, TaskSubtaskList
 from resources.task import Task, TaskList
-from resources.user import (
-    User,
-    UserLogin,
-    UserRegister,
-    UserLogout,
-    TokenRefresh,
-    UserConfirm,
-)
+from resources.user import User, UserLogin, UserRegister, UserLogout, TokenRefresh
+from resources.confirmation import Confirmation, ConfirmationByUser
 from resources.audiobook import Audiobook, AudiobookList
 from resources.file import File
 
@@ -66,7 +61,8 @@ api.add_resource(UserRegister, "/register")
 api.add_resource(UserLogin, "/login")
 api.add_resource(UserLogout, "/logout")
 api.add_resource(TokenRefresh, "/refresh")
-api.add_resource(UserConfirm, "/user-confirm/<int:user_id>")
+api.add_resource(Confirmation, "/user-confirm/<string:confirmation_id>")
+api.add_resource(ConfirmationByUser, "/confirmation/user/<int:user_id>")
 api.add_resource(CollaboratorList, "/collaborators")
 api.add_resource(Collaborator, "/collaborator/<int:collaborator_id>", "/collaborator")
 api.add_resource(
