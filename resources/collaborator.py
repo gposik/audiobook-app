@@ -2,17 +2,16 @@ from flask import request
 from flask_restful import Resource
 from sqlalchemy import exc
 from db import db
+from libs.strings import gettext
+from utils.api_utils import request_schemas_load
 from models.collaborator import CollaboratorModel
 from models.user import UserModel
-from schemas.collaborator import CollaboratorSchema, CollaboratorSubtaskPathSchema
-from utils.api_utils import request_schemas_load
 from models.subtask import SubtaskModel
+from schemas.collaborator import CollaboratorSchema, CollaboratorSubtaskPathSchema
 from schemas.subtask import SubtaskSchema
 
 
 RESOURCE_NAME = "Collaborator"
-NOT_CURRENT_SUBTASK = "This user has no subtask assigned"
-SUBTASK_ASSIGNED_SUCCESSFULLY = "The subtask was successfully assigned"
 
 collaborator_schema = CollaboratorSchema()
 collaborator_list_schema = CollaboratorSchema(many=True)
@@ -37,7 +36,7 @@ class Collaborator(Resource):
             collaborator.save_to_db()
         except exc.IntegrityError:
             db.session.rollback()
-            return {"messages": "Something went wrong when saving to database"}, 409
+            return {"messages": gettext("failed_to_save_to_db")}, 409
 
         return collaborator_schema.dump(collaborator), 201
 
@@ -57,7 +56,7 @@ class CollaboratorSubtask(Resource):
 
         subtask = collaborator.get_current_subtask()
         if not subtask:
-            return {"message": NOT_CURRENT_SUBTASK}, 404
+            return {"message": gettext("collaborator_subtask_not_found")}, 404
 
         return subtask_schema.dump(subtask), 200
 
@@ -71,4 +70,4 @@ class CollaboratorSubtask(Resource):
         collaborator.subtask_id = subtask.id
         collaborator.save_to_db()
 
-        return {"message": SUBTASK_ASSIGNED_SUCCESSFULLY}, 200
+        return {"message": gettext("collaborator_subtask_assigned")}, 200

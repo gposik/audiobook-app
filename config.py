@@ -49,11 +49,3 @@ env_config = {
     "production": ProductionConfig,
     "staging": StagingConfig,
 }
-
-
-# Validation messages
-ALREADY_EXISTS = "{} with that {} already exists"
-CREATED_SUCCESSFULLY = "{} created successfully"
-FAILED_TO_CREATE = "Failed to create {}"
-NOT_FOUND = "{} not found"
-DELETED = "{} deleted"

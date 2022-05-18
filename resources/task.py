@@ -6,7 +6,7 @@ from io import StringIO
 from flask_restful import Resource
 from flask import current_app as app, request
 from flask_jwt_extended import jwt_required
-from config import ALREADY_EXISTS, CREATED_SUCCESSFULLY, NOT_FOUND
+from libs.strings import gettext
 from models.audiobook import AudiobookModel
 from models.subtask import SubtaskModel
 from models.task import TaskModel
@@ -30,7 +30,7 @@ class Task(Resource):
     def get(cls, task_id: int):
         task = TaskModel.find_by_id(task_id)
         if not task:
-            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+            return {"message": gettext("entity_not_found").format(RESOURCE_NAME)}, 404
         return task_schema.dump(task), 200
 
     @classmethod
@@ -39,23 +39,25 @@ class Task(Resource):
         task = task_schema.load(task_json)
 
         if not AudiobookModel.find_by_id(task.audiobook_id):
-            return {"message": "the audiobook_id entered does not exist."}, 404
+            return {"message": gettext("entity_not_found").format("Audiobook")}, 404
 
         if TaskModel.find_by_audiobook_id(task.audiobook_id):
             return {
-                "message": ALREADY_EXISTS.format(RESOURCE_NAME, "audiobook_id")
+                "message": gettext("entity_with_already_exists").format(
+                    RESOURCE_NAME, "audiobook_id"
+                )
             }, 400
 
         task.save_to_db()
 
-        # Obtener filepath
+        # Obtain filepath
         file_path = os.path.join(app.config["UPLOAD_FOLDER"], task.audiobook.book_file)
-        # Obtener texto de archivo .mobi
+        # Obtain text from .mobi file
         try:
             book_text = get_text_from_mobi_file(file_path)
         except FileNotFoundError:
             task.delete_from_db()
-            return {"error": "the book file does not exist."}, 404
+            return {"message": gettext("entity_not_found").format("File")}, 404
 
         # Ordenar los fragmentos
         sorted_fragments = sorted(task.fragments, key=lambda i: i["first_line"])
@@ -79,7 +81,7 @@ class Task(Resource):
             subtask.save_to_db()
 
         return {
-            "message": CREATED_SUCCESSFULLY.format(RESOURCE_NAME),
+            "message": gettext("entity_created").format(RESOURCE_NAME),
             "task": task_schema.dump(task),
         }, 201
 

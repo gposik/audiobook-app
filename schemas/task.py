@@ -61,21 +61,3 @@ class TaskSchema(ma.SQLAlchemyAutoSchema):
                         }
                     )
             ranges.append(list(range(first_line, last_line + 1)))
-
-
-# class TaskSchema2(Schema):
-#     id = fields.Int(dump_only=True)
-#     collaborators_number = fields.Int(required=True)
-#     is_completed = fields.Boolean(required=False)
-#     audiobook_id = fields.Int(required=True)
-#     subtasks = fields.List(fields.Nested(SubtaskSchema))
-#     fragments = fields.List(
-#         fields.Nested(FragmentSchema()),
-#         required=True,
-#         load_only=True,
-#         validate=validate.Length(min=1),
-#     )
-
-#     @post_load
-#     def make_task(self, data, **kwargs):
-#         return TaskModel(**data)

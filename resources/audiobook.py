@@ -3,11 +3,10 @@ from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import jwt_required
 from sqlalchemy import text
+from libs.strings import gettext
 from models.audiobook import AudiobookModel
-from models.task import TaskModel
 from schemas.audiobook import AudiobookSchema
 
-from config import *
 
 RESOURCE_NAME = "Audiobook"
 
@@ -20,7 +19,7 @@ class Audiobook(Resource):
     def get(cls, audiobook_id: int):
         audiobook = AudiobookModel.find_by_id(audiobook_id)
         if not audiobook:
-            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+            return {"message": gettext("entity_not_found").format(RESOURCE_NAME)}, 404
         return audiobook_schema.dump(audiobook), 200
 
     @classmethod
@@ -29,7 +28,11 @@ class Audiobook(Resource):
         audiobook = audiobook_schema.load(audiobook_json)
 
         if AudiobookModel.find_by_name(audiobook.name):
-            return {"message": ALREADY_EXISTS.format(RESOURCE_NAME, "name")}, 400
+            return {
+                "message": gettext("entity_with_already_exists").format(
+                    RESOURCE_NAME, "name"
+                )
+            }, 400
 
         last_audiobook = AudiobookModel.query.order_by(text("id desc")).first()
         if last_audiobook:
@@ -42,7 +45,7 @@ class Audiobook(Resource):
         audiobook.save_to_db()
 
         return {
-            "message": CREATED_SUCCESSFULLY.format(RESOURCE_NAME),
+            "message": gettext("entity_created").format(RESOURCE_NAME),
             "audiobook": audiobook_schema.dump(audiobook),
         }, 201
 
@@ -50,10 +53,10 @@ class Audiobook(Resource):
     def delete(cls, audiobook_id: int):
         audiobook = AudiobookModel.find_by_id(audiobook_id)
         if not audiobook:
-            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+            return {"message": gettext("entity_not_found").format(RESOURCE_NAME)}, 404
 
         audiobook.delete_from_db()
-        return {"message": DELETED.format(RESOURCE_NAME)}, 204
+        return {"message": gettext("entity_deleted").format(RESOURCE_NAME)}, 204
 
 
 class AudiobookList(Resource):

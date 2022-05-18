@@ -17,7 +17,7 @@ class ConfirmationModel(BaseModel):
 
     id = db.Column(db.String(50), primary_key=True)
     expired_at = db.Column(db.DateTime, default=default_expiration, nullable=False)
-    is_confirmed = db.Column(db.Boolean, nullable=False)
+    is_confirmed = db.Column(db.Boolean, default=False, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     user = db.relationship(
         "UserModel",
@@ -28,8 +28,9 @@ class ConfirmationModel(BaseModel):
         super().__init__(**kwargs)
         self.user_id = user_id
         self.id = uuid4().hex
-        # self.expired_at = default_expiration()
-        self.is_confirmed = False
+
+    def __repr__(self):
+        return f"Confirmation <id:{self.id}>"
 
     @property
     def is_expired(self) -> bool:

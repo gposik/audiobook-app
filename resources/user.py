@@ -10,23 +10,12 @@ from flask_jwt_extended import (
     get_jwt,
 )
 from blacklist import BLACKLIST
-from config import (
-    ALREADY_EXISTS,
-    NOT_FOUND,
-    DELETED,
-    FAILED_TO_CREATE,
-)
 from libs.mailgun import MailgunException
+from libs.strings import gettext
 from models.user import UserModel
 from schemas.user import UserSchema
 from models.confirmation import ConfirmationModel
 
-INVALID_CREDENTIALS = "Invalid credentials!"
-USER_LOGGED_OUT = "User <id={}> successfully logged out."
-SUCCESS_REGISTER_MESSAGE = "Account created succesfully, an activation link has been sent to your email address. Please check"
-NOT_CONFIRMED_ERROR = (
-    "You have not confirmed registration, please check your email <{}>"
-)
 RESOURCE_NAME = "User"
 
 user_schema = UserSchema()
@@ -38,11 +27,18 @@ class UserRegister(Resource):
         user_json = request.get_json()
         user = user_schema.load(user_json)
 
-        if UserModel.find_by_username(user.username) or UserModel.find_by_email(
-            user.email
-        ):
+        if UserModel.find_by_username(user.username):
             return {
-                "message": ALREADY_EXISTS.format(RESOURCE_NAME, "username or email")
+                "message": gettext("entity_with_already_exists").format(
+                    RESOURCE_NAME, "username"
+                )
+            }, 400
+
+        if UserModel.find_by_email(user.email):
+            return {
+                "message": gettext("entity_with_already_exists").format(
+                    RESOURCE_NAME, "email"
+                )
             }, 400
 
         try:
@@ -50,14 +46,16 @@ class UserRegister(Resource):
             confirmation = ConfirmationModel(user.id)
             confirmation.save_to_db()
             # user.send_confirmation_email()
-            return {"message": SUCCESS_REGISTER_MESSAGE}, 201
+            return {"message": gettext("user_registered")}, 201
         except MailgunException as e:
             db.session.rollback()
             return {"message": e.messages}, 500
         except:
             traceback.print_exc()
             db.session.rollback()
-            return {"message": FAILED_TO_CREATE.format(RESOURCE_NAME)}, 500
+            return {
+                "message": gettext("entity_failed_to_create").format(RESOURCE_NAME)
+            }, 500
 
 
 class User(Resource):
@@ -70,16 +68,16 @@ class User(Resource):
     def get(cls, user_id: int):
         user = UserModel.find_by_id(user_id)
         if not user:
-            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+            return {"message": gettext("entity_not_found").format(RESOURCE_NAME)}, 404
         return user_schema.dump(user), 200
 
     @classmethod
     def delete(cls, user_id: int):
         user = UserModel.find_by_id(user_id)
         if not user:
-            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+            return {"message": gettext("entity_not_found").format(RESOURCE_NAME)}, 404
         user.delete_from_db()
-        return {"message": DELETED.format(RESOURCE_NAME)}, 200
+        return {"message": gettext("entity_deleted").format(RESOURCE_NAME)}, 200
 
 
 class UserLogin(Resource):
@@ -101,8 +99,8 @@ class UserLogin(Resource):
                     "access_token": access_token,
                     "refresh_token": refresh_token,
                 }, 200
-            return {"message": NOT_CONFIRMED_ERROR.format(user.email)}, 400
-        return {"message": INVALID_CREDENTIALS}, 401
+            return {"message": gettext("user_not_confirmed").format(user.email)}, 400
+        return {"message": gettext("user_invalid_credentials")}, 401
 
 
 class UserLogout(Resource):
@@ -112,7 +110,7 @@ class UserLogout(Resource):
         jti = get_jwt()["jti"]  # jti is "JWT ID", a unique identifier for a JWT.
         user_id = get_jwt_identity()
         BLACKLIST.add(jti)
-        return {"message": USER_LOGGED_OUT.format(user_id)}, 200
+        return {"message": gettext("user_logged_out").format(user_id)}, 200
 
 
 class TokenRefresh(Resource):

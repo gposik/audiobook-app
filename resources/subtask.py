@@ -2,11 +2,11 @@ from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import jwt_required
 from operator import itemgetter
-from config import CREATED_SUCCESSFULLY, NOT_FOUND
+from utils.api_utils import request_schemas_load
+from libs.strings import gettext
 from models.subtask import SubtaskModel
 from models.task import TaskModel
 from schemas.subtask import SubtaskQuerySchema, SubtaskSchema
-from utils.api_utils import request_schemas_load
 
 RESOURCE_NAME = "Subtask"
 
@@ -19,11 +19,11 @@ class TaskSubtask(Resource):
     def get(cls, task_id: int, subtask_id: int):
         task = TaskModel.find_by_id(task_id)
         if not task:
-            return {"message": NOT_FOUND.format("Task")}, 404
+            return {"message": gettext("entity_not_found").format("Task")}, 404
 
         subtask = task.get_subtask_by_id(subtask_id)
         if not subtask:
-            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+            return {"message": gettext("entity_not_found").format(RESOURCE_NAME)}, 404
 
         return subtask_schema.dump(subtask), 200
 
@@ -42,11 +42,11 @@ class TaskSubtask(Resource):
         body = itemgetter("body")(results)
 
         if not TaskModel.find_by_id_or_404(task_id):
-            return {"message": NOT_FOUND.format("Task")}, 404
+            return {"message": gettext("entity_not_found").format("Task")}, 404
 
         subtask = SubtaskModel.find_by_id_or_404(subtask_id)
         if not subtask:
-            return {"message": NOT_FOUND.format(RESOURCE_NAME)}, 404
+            return {"message": gettext("entity_not_found").format(RESOURCE_NAME)}, 404
 
         for key, value in body.items():
             if getattr(subtask, key) is not None:
@@ -65,7 +65,7 @@ class TaskSubtask(Resource):
         subtask.save_to_db()
 
         return {
-            "message": CREATED_SUCCESSFULLY.format(RESOURCE_NAME),
+            "message": gettext("entity_created").format(RESOURCE_NAME),
             "data": subtask_schema.dump(subtask),
         }, 201
 

@@ -4,6 +4,7 @@ from requests import Response
 from models.base import BaseModel
 from models.confirmation import ConfirmationModel
 from libs.mailgun import Mailgun
+from libs.strings import gettext
 
 
 class UserModel(BaseModel):
@@ -33,8 +34,9 @@ class UserModel(BaseModel):
         link = request.url_root[:-1] + url_for(
             "confirmation", confirmation_id=self.most_recent_confirmation.id
         )
-        subject = "Registration confirmation."
-        text = f"Please click the link to confirm your registration: {link}"
-        html = f'<html>Please click the link to confirm your registration: <a href="{link}">{link}</a></html>'
+
+        subject = gettext("user_confirmation_email_subject")
+        text = f'{gettext("user_confirmation_email_text")} {link}'
+        html = f'<html>{gettext("user_confirmation_email_text")}<a href="{link}">{link}</a></html>'
 
         Mailgun.send_email([self.email], subject, text, html)

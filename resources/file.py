@@ -4,6 +4,7 @@ from flask_restful import Resource
 from flask import current_app as app, request
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
+from libs.strings import gettext
 from schemas.file import FileQuerySchema, FileSchema
 
 file_query_schema = FileQuerySchema()
@@ -40,9 +41,9 @@ class File(Resource):
             target = os.path.join(app.config["UPLOAD_FOLDER"], uploaded_file.filename)
 
             uploaded_file.save(target)
-            return ({"message": "File uploaded successfully"}), 201
+            return ({"message": gettext("file_uploaded")}), 201
 
-        return ({"message": "An error occured"}), 400
+        return ({"message": gettext("unexpected_error")}), 400
 
     @classmethod
     def get(cls):
