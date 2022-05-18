@@ -1,4 +1,4 @@
-from time import time
+from datetime import datetime
 import traceback
 
 from flask import make_response, render_template
@@ -16,6 +16,7 @@ RESEND_FAILED = "Failed to resend confirmation email"
 CONFIRMATION_SUCCESSFUL = "E-mail confirmation successfully re-sent"
 
 confirmation_schema = ConfirmationSchema()
+confirmation_schema_list = ConfirmationSchema(many=True)
 
 
 class Confirmation(Resource):
@@ -27,23 +28,20 @@ class Confirmation(Resource):
         if not confirmation:
             return {"message": NOT_FOUND}, 404
 
-        if confirmation.expired:
+        if confirmation.is_expired:
             return {"message": EXPIRED}, 400
 
-        if confirmation.confirmed:
+        if confirmation.is_confirmed:
             return {"message": ALREADY_CONFIRMED}, 400
 
         confirmation.confirmed = True
         confirmation.save_to_db()
 
-        headers = {"Content-Type": "text/html"}
-        return (
-            make_response(
-                render_template("confirmation_page.html"), email=confirmation.user.email
-            ),
-            200,
-            headers,
+        response = make_response(
+            render_template("confirmation_page.html", email=confirmation.user.email)
         )
+        response.headers["Content-Type"] = "text/html"
+        return response
 
 
 class ConfirmationByUser(Resource):
@@ -51,13 +49,16 @@ class ConfirmationByUser(Resource):
     def get(cls, user_id):
         """Returns confirmations for a given user. Used for testing purpouse."""
         user = UserModel.find_by_id_or_404(user_id)
-
+        sorted_user_confirmations = user.confirmation.order_by(
+            ConfirmationModel.expired_at
+        )
         return {
-            "current_time": int(time()),
-            "confirmations": [
-                confirmation_schema.dump(each)
-                for each in user.confirmation.order_by(ConfirmationModel.expired_at)
-            ],
+            "current_time": datetime.utcnow(),
+            "confirmations": confirmation_schema_list.dump(sorted_user_confirmations)
+            # "confirmations": [
+            #     confirmation_schema.dump(each)
+            #     for each in user.confirmation.order_by(ConfirmationModel.expired_at)
+            # ],
         }, 200
 
     @classmethod
@@ -68,9 +69,9 @@ class ConfirmationByUser(Resource):
         try:
             confirmation = user.most_recent_confirmation
             if confirmation:
-                if confirmation.confirmed:
+                if confirmation.is_confirmed:
                     return {"message": ALREADY_CONFIRMED}, 400
-            confirmation.force_to_expire()
+                confirmation.force_to_expire()
 
             new_confirmation = ConfirmationModel(user_id)
             new_confirmation.save_to_db()

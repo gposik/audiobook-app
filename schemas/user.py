@@ -1,16 +1,24 @@
 import re
 from ma import ma
-from marshmallow import validates, ValidationError
+from marshmallow import pre_dump, validates, ValidationError, fields
 from models.user import UserModel
+from schemas.confirmation import ConfirmationSchema
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
+    confirmation = fields.Nested(ConfirmationSchema, many=True)
+
     class Meta:
         model = UserModel
         load_only = ("password",)
-        dump_only = ("id", "activated")
+        dump_only = ("id", "confirmation")
         include_fk = True
         load_instance = True
+
+    @pre_dump
+    def only_most_recent_confirmation(self, user: UserModel, **kwargs):
+        user.confirmation = [user.most_recent_confirmation]
+        return user
 
     @validates("password")
     def validate_password(self, value):

@@ -1,26 +1,39 @@
 from uuid import uuid4
 from time import time
+from datetime import datetime, timedelta
+from sqlalchemy.orm import backref
 from db import db
 from models.base import BaseModel
 
 CONFIRMATION_EXPIRATION_DELTA = 1800  # 30 minutes
 
 
+def default_expiration():
+    return datetime.utcnow() + timedelta(minutes=CONFIRMATION_EXPIRATION_DELTA)
+
+
 class ConfirmationModel(BaseModel):
     __tablename__ = "confirmations"
 
     id = db.Column(db.String(50), primary_key=True)
-    expired_at = db.Column(db.Integer, nullable=False)
-    confirmed = db.Column(db.Boolean, nullable=False)
+    expired_at = db.Column(db.DateTime, default=default_expiration, nullable=False)
+    is_confirmed = db.Column(db.Boolean, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    user = db.relationship("UserModel")
+    user = db.relationship(
+        "UserModel",
+        backref=backref("confirmation", lazy="dynamic", cascade="all, delete-orphan"),
+    )
 
     def __init__(self, user_id: int, **kwargs):
         super().__init__(**kwargs)
         self.user_id = user_id
         self.id = uuid4().hex
-        self.expired_at = int(time()) + CONFIRMATION_EXPIRATION_DELTA
-        self.confirmed = False
+        # self.expired_at = default_expiration()
+        self.is_confirmed = False
+
+    @property
+    def is_expired(self) -> bool:
+        return datetime.utcnow() > self.expired_at
 
     @classmethod
     def find_by_id(cls, _id: str) -> "ConfirmationModel":
@@ -30,11 +43,7 @@ class ConfirmationModel(BaseModel):
     def find_by_id_or_404(cls, _id: str) -> "ConfirmationModel":
         return super().find_by_id_or_404(_id)
 
-    @property
-    def expired(self) -> bool:
-        return time() > self.expired_at
-
     def force_to_expire(self) -> None:
-        if not self.expired:
-            self.expired_at = int(time())
+        if not self.is_expired:
+            self.expired_at = datetime.utcnow()
             self.save_to_db()

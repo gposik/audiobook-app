@@ -12,16 +12,13 @@ class UserModel(BaseModel):
     username = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(80), nullable=False, unique=True)
-    confirmation = db.relationship(
-        "ConfirmationModel", lazy="dynamic", cascade="all, delete-orphan"
-    )
+
+    def __repr__(self):
+        return f"User {self.username}"
 
     @property
     def most_recent_confirmation(self) -> "ConfirmationModel":
         return self.confirmation.order_by(db.desc(ConfirmationModel.expired_at)).first()
-
-    def __repr__(self):
-        return f"User {self.username}"
 
     @classmethod
     def find_by_username(cls, username: str) -> "UserModel":

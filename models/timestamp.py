@@ -15,5 +15,6 @@ class Timestamp(object):
     expiration_date = db.Column(db.DateTime, nullable=False, default=tomorrows_date)
     finish_date = db.Column(db.DateTime)
 
+    @property
     def is_expired(self) -> bool:
         return datetime.utcnow() >= self.expiration_date

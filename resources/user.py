@@ -19,6 +19,7 @@ from config import (
 from libs.mailgun import MailgunException
 from models.user import UserModel
 from schemas.user import UserSchema
+from models.confirmation import ConfirmationModel
 
 INVALID_CREDENTIALS = "Invalid credentials!"
 USER_LOGGED_OUT = "User <id={}> successfully logged out."
@@ -46,6 +47,8 @@ class UserRegister(Resource):
 
         try:
             user.save_to_db()
+            confirmation = ConfirmationModel(user.id)
+            confirmation.save_to_db()
             # user.send_confirmation_email()
             return {"message": SUCCESS_REGISTER_MESSAGE}, 201
         except MailgunException as e:
@@ -53,6 +56,7 @@ class UserRegister(Resource):
             return {"message": e.messages}, 500
         except:
             traceback.print_exc()
+            db.session.rollback()
             return {"message": FAILED_TO_CREATE.format(RESOURCE_NAME)}, 500
 
 
@@ -88,7 +92,8 @@ class UserLogin(Resource):
 
         # this is what the `authenticate()` function did in security.py
         if user and (user.password == user_data.password):
-            if user.activated:
+            confirmation = user.most_recent_confirmation
+            if confirmation and confirmation.is_confirmed:
                 # identity= is what the identity() function did in security.py—now stored in the JWT
                 access_token = create_access_token(identity=user.id, fresh=True)
                 refresh_token = create_refresh_token(user.id)
