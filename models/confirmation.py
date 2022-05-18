@@ -5,7 +5,7 @@ from sqlalchemy.orm import backref
 from db import db
 from models.base import BaseModel
 
-CONFIRMATION_EXPIRATION_DELTA = 1800  # 30 minutes
+CONFIRMATION_EXPIRATION_DELTA = 30  # 30 minutes
 
 
 def default_expiration():

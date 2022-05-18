@@ -34,7 +34,7 @@ class Confirmation(Resource):
         if confirmation.is_confirmed:
             return {"message": ALREADY_CONFIRMED}, 400
 
-        confirmation.confirmed = True
+        confirmation.is_confirmed = True
         confirmation.save_to_db()
 
         response = make_response(
@@ -53,12 +53,8 @@ class ConfirmationByUser(Resource):
             ConfirmationModel.expired_at
         )
         return {
-            "current_time": datetime.utcnow(),
-            "confirmations": confirmation_schema_list.dump(sorted_user_confirmations)
-            # "confirmations": [
-            #     confirmation_schema.dump(each)
-            #     for each in user.confirmation.order_by(ConfirmationModel.expired_at)
-            # ],
+            "current_time": str(datetime.utcnow()),
+            "confirmations": confirmation_schema_list.dump(sorted_user_confirmations),
         }, 200
 
     @classmethod
