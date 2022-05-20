@@ -15,6 +15,7 @@ mobi = "*"
 html2text = "*"
 requests = "*"
 python-dotenv = "*"
+flask-reuploaded = "*"
 
 [dev-packages]
 black = "*"

@@ -12,12 +12,10 @@ class Config:
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
     JWT_ACCESS_TOKEN_EXPIRES = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", 14400))
-    UPLOAD_FOLDER = os.path.join(basedir, "static/uploads/")
-    ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif", "svg", "bmp", "pdf", "mobi"])
     ALLOWED_MIMETYPES_EXTENSIONS = set(
         ["image/apng", "image/bmp", "image/jpeg", "image/png", "image/svg+xml"]
     )
-    MAX_CONTENT_LENGTH = 4 * 1024 * 1024
+    MAX_CONTENT_LENGTH = 10 * 1024 * 1024
 
     @staticmethod
     def init_app(app):
@@ -29,6 +27,10 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DEV_DATABASE_URL"
     ) or "sqlite:///" + os.path.join(basedir, "data.sqlite")
+    UPLOAD_FOLDER = os.path.join(basedir, "static/uploads/")
+    UPLOADED_IMAGES_DEST = os.path.join(UPLOAD_FOLDER, "images")
+    UPLOADED_BOOKS_DEST = os.path.join(UPLOAD_FOLDER, "books")
+    UPLOADED_BOOKS_ALLOW = ("mobi", "pdf", "epub")
 
 
 class TestingConfig(Config):

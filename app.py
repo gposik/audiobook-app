@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, send_file
 from flask_restful import Api
+from flask_uploads import configure_uploads
 from flask_jwt_extended import JWTManager
 from werkzeug.security import safe_join
 
@@ -10,6 +11,7 @@ from db import db
 from config import env_config
 from blacklist import BLACKLIST
 from errors import error_bp
+from libs.file_helper import IMAGE_SET, BOOK_SET
 from resources.collaborator import Collaborator, CollaboratorList, CollaboratorSubtask
 from resources.subtask import TaskSubtask, TaskSubtaskList
 from resources.task import Task, TaskList
@@ -17,13 +19,14 @@ from resources.user import User, UserLogin, UserRegister, UserLogout, TokenRefre
 from resources.confirmation import Confirmation, ConfirmationByUser
 from resources.audiobook import Audiobook, AudiobookList
 from resources.file import File
+from resources.book import BookUpload
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 
 app.config.from_object(env_config["development"])
-
+configure_uploads(app, (IMAGE_SET, BOOK_SET))
 app.register_blueprint(error_bp)
 
 api = Api(app)
@@ -81,8 +84,10 @@ api.add_resource(
 )
 api.add_resource(TaskSubtaskList, "/task/<int:task_id>/subtasks")
 api.add_resource(File, "/upload-file", "/download-file")
+api.add_resource(BookUpload, "/upload/book")
+
 
 if __name__ == "__main__":
     db.init_app(app)
     ma.init_app(app)
-    app.run(port=5000, debug=True)
+    app.run(port=5000)
