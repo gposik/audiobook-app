@@ -1,6 +1,9 @@
 {
   "book_uploaded": "Book {} successfully uploaded.",
   "book_illegal_extension": "Extension '{}' is not allowed.",
+  "book_not_found": "Book '{}' not found.",
+  "book_deleted": "Book '{}' deleted.",
+  "book_delete_failed": "Something went wrong when trying to delete the book. Please try again.",
   "confirmation_link_expired": "The link has expired.",
   "confirmation_already_confirmed": "Registration has already been confirmed.",
   "confirmation_resend_failed": "Failed to resend confirmation email.",
@@ -14,6 +17,7 @@
   "entity_already_exists": "{} already exists.",
   "entity_with_already_exists": "{} with that {} already exists",
   "file_uploaded": "The file was successfully uploaded.",
+  "file_illegal_file_name": "Illegal filename '{}' requested.",
   "failed_to_save_to_db": "Something went wrong when saving to database.",
   "mailgun_failed_load_api_key": "Failed to load MailGun API key.",
   "mailgun_failed_load_domain": "Failed to load MailGun domain.",

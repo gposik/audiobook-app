@@ -1,40 +1,24 @@
 import os
 import re
-from typing import Tuple, Union
+from typing import Callable, Iterable, Optional, Union
+from flask import Flask
 from werkzeug.datastructures import FileStorage
-from flask_uploads import UploadSet, IMAGES, BOOKS
+from flask_uploads import UploadSet, IMAGES, BOOKS, DEFAULTS
 
 
-IMAGE_SET = UploadSet("images", IMAGES)
-BOOK_SET = UploadSet("books", BOOKS)
+# UploadSet args <name>, <extensions>, <default_dest>
+IMAGE_CONF = ("images", IMAGES)
+BOOK_CONF = ("books", BOOKS)
 
-upload_sets = {"image": IMAGE_SET, "book": BOOK_SET}
 
-
-class FileHelper:
-    def __init__(self, upload_set: Union[str, UploadSet]):
-        if isinstance(upload_set, str):
-            self.upload_set = upload_sets.get(upload_set)
-        else:
-            self.upload_set = UploadSet()
-
-    @property
-    def extensions(self) -> Tuple:
-        return self.upload_set.extensions
-
-    @property
-    def destination(self) -> str:
-        return self.upload_set.default_dest
-
-    @property
-    def destination(self, dest: str):
-        self.upload_set.default_dest = dest
-
-    def save_file(self, file: FileStorage, folder: str = None, name: str = None) -> str:
-        return self.upload_set.save(file, folder, name)
-
-    def get_path(self, filename: str = None, folder: str = None) -> str:
-        return self.upload_set.path(filename, folder)
+class FileHelper(UploadSet):
+    def __init__(
+        self,
+        name: str,
+        extensions: Iterable[str] = DEFAULTS,
+        default_dest: Optional[Callable[[Flask], str]] = None,
+    ) -> None:
+        super().__init__(name, extensions, default_dest)
 
     def find_file_any_format(self, filename: str, folder: str) -> Union[str, None]:
         """
@@ -44,11 +28,11 @@ class FileHelper:
         :param folder: the relative folder in which to search
         :return: the path of the image if exists, otherwise None
         """
-        for _format in self.extensions:  # look for existing avatar and delete it
-            avatar = f"{filename}.{_format}"
-            avatar_path = self.upload_set.path(filename=avatar, folder=folder)
-            if os.path.isfile(avatar_path):
-                return avatar_path
+        for _format in self.extensions:
+            file = f"{filename}.{_format}"
+            file_path = self.path(filename=file, folder=folder)
+            if os.path.isfile(file_path):
+                return file_path
         return None
 
     def _retrieve_filename(self, file: Union[str, FileStorage]) -> str:
@@ -69,7 +53,7 @@ class FileHelper:
         filename = self._retrieve_filename(file)
 
         allowed_format = "|".join(self.extensions)
-        # format BOOKS into regex, eg: ('mobi','pdf') --> 'mobi|pdf'
+        # format extensions into regex, eg: ('mobi','pdf') --> 'mobi|pdf'
         regex = f"^[a-zA-Z0-9][a-zA-Z0-9_()-\.]*\.({allowed_format})$"
         return re.match(regex, filename) is not None
 

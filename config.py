@@ -28,6 +28,7 @@ class DevelopmentConfig(Config):
         "DEV_DATABASE_URL"
     ) or "sqlite:///" + os.path.join(basedir, "data.sqlite")
     UPLOAD_FOLDER = os.path.join(basedir, "static/uploads/")
+    UPLOADED_FILES_DEST = os.path.join(UPLOAD_FOLDER, "files")
     UPLOADED_IMAGES_DEST = os.path.join(UPLOAD_FOLDER, "images")
     UPLOADED_BOOKS_DEST = os.path.join(UPLOAD_FOLDER, "books")
     UPLOADED_BOOKS_ALLOW = ("mobi", "pdf", "epub")
