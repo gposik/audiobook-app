@@ -1,3 +1,4 @@
+from io import StringIO
 from typing import List
 from db import db
 from models.base import BaseModel
@@ -19,7 +20,7 @@ class TaskModel(Timestamp, BaseModel):
         backref=backref("task", uselist=False, cascade="all, delete-orphan"),
     )
     subtasks = db.relationship("SubtaskModel")
-    fragments = []
+    fragments_ranges = []
 
     def __repr__(self):
         return f"Task <id:{self.id}>"
@@ -33,3 +34,25 @@ class TaskModel(Timestamp, BaseModel):
 
     def get_subtask_by_id(self, subtask_id: int) -> "SubtaskModel":
         return next((x for x in self.subtasks if x.id == subtask_id), None)
+
+    def get_fragments_from_text(self, text: str):
+        fragments = []
+
+        book_iter = StringIO(text)
+        last = 0
+        for fragment in self.fragments_ranges:
+            init = fragment["first_line"]
+            finish = fragment["last_line"]
+
+            for _ in range(last, init):
+                next(book_iter)
+
+            frg = ""
+            for _ in range(init, finish + 1):
+                frg += book_iter.readline()
+
+            last = finish
+
+            fragments.append(frg)
+
+        return fragments

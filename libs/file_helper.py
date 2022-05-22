@@ -20,7 +20,9 @@ class FileHelper(UploadSet):
     ) -> None:
         super().__init__(name, extensions, default_dest)
 
-    def find_file_any_format(self, filename: str, folder: str) -> Union[str, None]:
+    def find_file_any_format(
+        self, filename: str, folder: str = None
+    ) -> Union[str, None]:
         """
         Given a format-less filename, try to find the file by appending each of the allowed formats to the given
         filename and check if the file exists

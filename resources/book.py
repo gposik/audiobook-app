@@ -31,13 +31,9 @@ class BookUpload(Resource):
         name = query_params["name"]
 
         data = book_schema.load(request.files)
-        user_id = get_jwt_identity()
-        folder = f"user_{user_id}"
         extension = file_helper.get_extension(data["book"])
         try:
-            book_path = file_helper.save(
-                data["book"], folder=folder, name=(name + extension)
-            )
+            book_path = file_helper.save(data["book"], name=(name + extension))
             # here we only return the basename of the book and hide the internal folder structure from our user
             basename = file_helper.get_basename(book_path)
             return {"message": gettext("book_uploaded").format(basename)}, 201
@@ -53,14 +49,12 @@ class Book(Resource):
         This endpoint returns the requested book if exists. It will use JWT to
         retrieve user information and look for the book inside the user's folder.
         """
-        user_id = get_jwt_identity()
-        folder = f"user_{user_id}"
         # check if filename is URL secure
         if not file_helper.is_filename_safe(filename):
             return {"message": gettext("file_illegal_file_name").format(filename)}, 400
         try:
             # try to send the requested file to the user with status code 200
-            return send_file(file_helper.path(filename, folder=folder))
+            return send_file(file_helper.path(filename))
         except FileNotFoundError:
             return {"message": gettext("book_not_found").format(filename)}, 404
 
@@ -71,15 +65,13 @@ class Book(Resource):
         This endpoint is used to delete the requested book under the user's folder.
         It uses the JWT to retrieve user information.
         """
-        user_id = get_jwt_identity()
-        folder = f"user_{user_id}"
 
         # check if filename is URL secure
         if not file_helper.is_filename_safe(filename):
             return {"message": gettext("file_illegal_file_name").format(filename)}, 400
 
         try:
-            os.remove(file_helper.path(filename, folder=folder))
+            os.remove(file_helper.path(filename))
             return {"message": gettext("book_deleted").format(filename)}, 200
         except FileNotFoundError:
             return {"message": gettext("book_not_found").format(filename)}, 404
