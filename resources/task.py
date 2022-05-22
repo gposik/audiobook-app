@@ -62,7 +62,6 @@ class Task(Resource):
             return {"message": gettext("book_not_found").format(filename)}, 404
 
         fragments = task.get_fragments_from_text(book_text)
-        print(fragments)
 
         for fragment in fragments:
             subtask = SubtaskModel(fragment=fragment, task_id=task.id)

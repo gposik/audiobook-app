@@ -4,7 +4,6 @@ import os
 from flask_restful import Resource
 from flask_uploads import UploadNotAllowed
 from flask import send_file, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from libs.file_helper import FileHelper, BOOK_CONF
 from libs.strings import gettext
@@ -18,11 +17,9 @@ file_helper = FileHelper(*BOOK_CONF)
 
 class BookUpload(Resource):
     @classmethod
-    @jwt_required()
     def post(cls):
         """
-        This endpoint is used to upload a book file. It uses the
-        JWT to retrieve user information and save the book in the user's folder.
+        This endpoint is used to upload a book file.
         If a file with the same name exists in the user's folder, name conflicts
         will be automatically resolved by appending a underscore and a smallest
         unused integer. (eg. filename.mobi to filename_1.pdf).
@@ -43,11 +40,9 @@ class BookUpload(Resource):
 
 class Book(Resource):
     @classmethod
-    @jwt_required()
     def get(cls, filename: str):
         """
-        This endpoint returns the requested book if exists. It will use JWT to
-        retrieve user information and look for the book inside the user's folder.
+        This endpoint returns the requested book if exists.
         """
         # check if filename is URL secure
         if not file_helper.is_filename_safe(filename):
@@ -59,11 +54,9 @@ class Book(Resource):
             return {"message": gettext("book_not_found").format(filename)}, 404
 
     @classmethod
-    @jwt_required()
     def delete(cls, filename: str):
         """
-        This endpoint is used to delete the requested book under the user's folder.
-        It uses the JWT to retrieve user information.
+        This endpoint is used to delete the requested book under the books folder.
         """
 
         # check if filename is URL secure

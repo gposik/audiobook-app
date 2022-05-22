@@ -12,7 +12,12 @@ from config import env_config
 from blacklist import BLACKLIST
 from errors import error_bp
 from libs.file_helper import IMAGE_CONF, BOOK_CONF, FileHelper
-from resources.collaborator import Collaborator, CollaboratorList, CollaboratorSubtask
+from resources.collaborator import (
+    Collaborator,
+    CollaboratorHistory,
+    CollaboratorList,
+    CollaboratorSubtask,
+)
 from resources.subtask import TaskSubtask, TaskSubtaskList
 from resources.task import Task, TaskList
 from resources.user import User, UserLogin, UserRegister, UserLogout, TokenRefresh
@@ -73,6 +78,7 @@ api.add_resource(
     "/collaborator/<int:collaborator_id>/subtask",
     "/collaborator/<int:collaborator_id>/subtask/<int:subtask_id>",
 )
+api.add_resource(CollaboratorHistory, "/collaborator/<int:collaborator_id>/history")
 api.add_resource(Audiobook, "/audiobook/<int:audiobook_id>", "/audiobook")
 api.add_resource(AudiobookList, "/audiobooks")
 api.add_resource(Task, "/task/<int:task_id>", "/task")

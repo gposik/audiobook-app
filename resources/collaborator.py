@@ -1,3 +1,4 @@
+from asyncio import current_task
 from flask import request
 from flask_restful import Resource
 from sqlalchemy import exc
@@ -16,6 +17,7 @@ RESOURCE_NAME = "Collaborator"
 collaborator_schema = CollaboratorSchema()
 collaborator_list_schema = CollaboratorSchema(many=True)
 subtask_schema = SubtaskSchema()
+subtask_list_schema = SubtaskSchema(many=True)
 
 
 class Collaborator(Resource):
@@ -29,8 +31,6 @@ class Collaborator(Resource):
         collaborator = collaborator_schema.load(collaborator_json)
 
         UserModel.find_by_id_or_404(collaborator.user_id)
-        if collaborator.subtask_id:
-            SubtaskModel.find_by_id_or_404(collaborator.subtask_id)
 
         try:
             collaborator.save_to_db()
@@ -54,7 +54,7 @@ class CollaboratorSubtask(Resource):
     def get(cls, collaborator_id: int):
         collaborator = CollaboratorModel.find_by_id_or_404(collaborator_id)
 
-        subtask = collaborator.get_current_subtask()
+        subtask = collaborator.current_subtask
         if not subtask:
             return {"message": gettext("collaborator_subtask_not_found")}, 404
 
@@ -65,9 +65,29 @@ class CollaboratorSubtask(Resource):
         request_schemas_load([CollaboratorSubtaskPathSchema()])
 
         collaborator = CollaboratorModel.find_by_id_or_404(collaborator_id)
+
+        current_subtask = collaborator.current_subtask
+        if current_subtask:
+            return {
+                "message": gettext("collaborator_already_has_subtask").format(
+                    current_subtask.id
+                )
+            }, 400
+
         subtask = SubtaskModel.find_by_id_or_404(subtask_id)
 
-        collaborator.subtask_id = subtask.id
-        collaborator.save_to_db()
+        if not subtask.is_valid:
+            return {"message": gettext("subtask_not_valid")}, 400
+
+        subtask.collaborator_id = collaborator.id
+        subtask.save_to_db()
 
         return {"message": gettext("collaborator_subtask_assigned")}, 200
+
+
+class CollaboratorHistory(Resource):
+    @classmethod
+    def get(cls, collaborator_id: int):
+        collaborator = CollaboratorModel.find_by_id_or_404(collaborator_id)
+
+        return subtask_list_schema.dump(collaborator.subtasks), 200
