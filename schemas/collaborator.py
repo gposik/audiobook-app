@@ -7,7 +7,7 @@ from schemas.subtask import SubtaskSchema
 
 
 class CollaboratorSchema(ma.SQLAlchemyAutoSchema):
-    subtasks = fields.Nested(SubtaskSchema, only=("id",), data_key="subtask")
+    subtasks = fields.Nested(SubtaskSchema, many=True, only=("id",), data_key="subtask")
 
     class Meta:
         model = CollaboratorModel

@@ -33,9 +33,7 @@ class Collaborator(Resource):
         user = UserModel.find_by_id_or_404(collaborator.user_id)
         if user.collaborator:
             return {
-                "message": "The user with user_id <{}> is already a collaborator".format(
-                    user.id
-                )
+                "message": gettext("user_already_collaborator").format(user.id)
             }, 400
 
         try:

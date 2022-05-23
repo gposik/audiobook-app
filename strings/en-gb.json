@@ -26,6 +26,7 @@
   "subtask_not_valid": "The subtask is either completed, expired or already assigned by a collaborator.",
   "task_invalid_fragment_range": "The range cannot be included in another range.",
   "unexpected_error": "An unexpected error has occurred. Please try again.",
+  "user_already_collaborator": "The user with id <{}> is already a collaborator",
   "user_invalid_credentials": "Invalid credentials!",
   "user_logged_out": "User <id={}> successfully logged out.",
   "user_not_confirmed": "You have not confirmed registration, please check your email <{}>.",
