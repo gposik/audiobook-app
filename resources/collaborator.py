@@ -17,7 +17,7 @@ RESOURCE_NAME = "Collaborator"
 collaborator_schema = CollaboratorSchema()
 collaborator_list_schema = CollaboratorSchema(many=True)
 subtask_schema = SubtaskSchema()
-subtask_list_schema = SubtaskSchema(many=True)
+subtask_list_schema = SubtaskSchema(many=True, exclude=("collaborator_id",))
 
 
 class Collaborator(Resource):
@@ -30,7 +30,13 @@ class Collaborator(Resource):
         collaborator_json = request.get_json()
         collaborator = collaborator_schema.load(collaborator_json)
 
-        UserModel.find_by_id_or_404(collaborator.user_id)
+        user = UserModel.find_by_id_or_404(collaborator.user_id)
+        if user.collaborator:
+            return {
+                "message": "The user with user_id <{}> is already a collaborator".format(
+                    user.id
+                )
+            }, 400
 
         try:
             collaborator.save_to_db()

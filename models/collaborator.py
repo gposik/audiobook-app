@@ -1,5 +1,6 @@
 from db import db
 from sqlalchemy import and_
+from sqlalchemy.orm import backref
 from sqlalchemy.ext.hybrid import hybrid_property
 from models.base import BaseModel
 from models.user import UserModel
@@ -9,7 +10,7 @@ from models.subtask import SubtaskModel
 class CollaboratorModel(BaseModel):
     __tablename__ = "collaborators"
 
-    user = db.relationship("UserModel")
+    user = db.relationship("UserModel", backref="collaborator")
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.id"), nullable=False, unique=True
     )

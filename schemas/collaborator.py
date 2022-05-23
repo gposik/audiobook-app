@@ -7,7 +7,7 @@ from schemas.subtask import SubtaskSchema
 
 
 class CollaboratorSchema(ma.SQLAlchemyAutoSchema):
-    subtasks = fields.Nested(SubtaskSchema, many=True, only=("id",))
+    subtasks = fields.Nested(SubtaskSchema, only=("id",), data_key="subtask")
 
     class Meta:
         model = CollaboratorModel
@@ -18,7 +18,8 @@ class CollaboratorSchema(ma.SQLAlchemyAutoSchema):
 
     @pre_dump
     def only_current_subtask(self, collaborator: CollaboratorModel, **kwargs):
-        collaborator.subtasks = [collaborator.current_subtask]
+        if collaborator.current_subtask:
+            collaborator.subtasks = [collaborator.current_subtask]
         return collaborator
 
 
