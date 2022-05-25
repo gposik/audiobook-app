@@ -1,6 +1,5 @@
 from db import db
 from sqlalchemy import and_
-from sqlalchemy.orm import backref
 from sqlalchemy.ext.hybrid import hybrid_property
 from models.base import BaseModel
 from models.user import UserModel
@@ -19,11 +18,11 @@ class CollaboratorModel(BaseModel):
     def __repr__(self):
         return f"Collaborator <id:{self.id}>"
 
-    def get_current_subtask(self) -> "SubtaskModel":
+    def get_current_subtask(self) -> SubtaskModel:
         return SubtaskModel.query.filter_by(id=self.subtask_id).first()
 
     @hybrid_property
-    def current_subtask(self) -> "SubtaskModel":
+    def current_subtask(self) -> SubtaskModel:
         return self.subtasks.filter(
             and_(SubtaskModel.is_completed == False, SubtaskModel.is_expired == False)
         ).first()

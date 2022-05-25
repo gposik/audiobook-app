@@ -82,6 +82,8 @@ class TaskSubtaskList(Resource):
 
         if "is_completed" in query:
             data = [x for x in data if x.is_completed == query["is_completed"]]
+        if "is_expired" in query:
+            data = [x for x in data if x.is_expired == query["is_expired"]]
         if "id" in query:
             data = [x for x in data if x.id == query["id"]]
 

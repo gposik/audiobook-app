@@ -1,6 +1,8 @@
-from asyncio import current_task
 from flask import request
 from flask_restful import Resource
+from flask_apispec import doc, marshal_with, use_kwargs
+from flask_apispec.views import MethodResource
+from pyparsing import col
 from sqlalchemy import exc
 from db import db
 from libs.strings import gettext
@@ -20,13 +22,17 @@ subtask_schema = SubtaskSchema()
 subtask_list_schema = SubtaskSchema(many=True, exclude=("collaborator_id",))
 
 
-class Collaborator(Resource):
-    @classmethod
-    def get(cls, collaborator_id: int):
+class Collaborator(MethodResource, Resource):
+    @doc(description="My First GET Awesome API.", tags=["Awesome"])
+    @marshal_with(collaborator_schema, apply=False)
+    def get(self, collaborator_id: int):
         collaborator = CollaboratorModel.find_by_id_or_404(collaborator_id)
         return collaborator_schema.dump(collaborator), 200
 
-    def post(cls):
+    @doc(description="My First GET Awesome API.", tags=["Awesome"])
+    @use_kwargs(collaborator_schema, location=("json"))
+    @marshal_with(collaborator_schema, apply=False)
+    def post(self, *args, **kwargs):
         collaborator_json = request.get_json()
         collaborator = collaborator_schema.load(collaborator_json)
 

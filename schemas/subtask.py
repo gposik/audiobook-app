@@ -5,8 +5,11 @@ from schemas.base import RequestQueryParamsSchema
 
 
 class SubtaskSchema(ma.SQLAlchemyAutoSchema):
+    is_expired = fields.Bool()
+
     class Meta:
         model = SubtaskModel
+        exclude = ["creation_date", "modification_date", "expiration_date"]
         dump_only = ("id",)
         load_only = ("task_id",)
         include_fk = True
@@ -19,4 +22,5 @@ class SubtaskQuerySchema(RequestQueryParamsSchema):
         unknown = EXCLUDE
 
     is_completed = fields.Boolean(description="Subtask status.")
+    is_expired = fields.Boolean(description="Subtask expired.")
     _id = fields.Int(descrition="Subtask", data_key="id", attribute="id")

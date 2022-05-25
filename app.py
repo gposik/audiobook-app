@@ -5,6 +5,7 @@ from flask_restful import Api
 from flask_uploads import configure_uploads
 from flask_jwt_extended import JWTManager
 from werkzeug.security import safe_join
+from flask_apispec.extension import FlaskApiSpec
 
 from ma import ma
 from db import db
@@ -31,10 +32,12 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 
 app.config.from_object(env_config["development"])
+
 configure_uploads(app, (FileHelper(*IMAGE_CONF), FileHelper(*BOOK_CONF)))
 app.register_blueprint(error_bp)
 
 api = Api(app)
+docs = FlaskApiSpec(app)
 
 
 @api.representation("application/octet-stream")
@@ -93,6 +96,7 @@ api.add_resource(File, "/upload-file", "/download-file")
 api.add_resource(BookUpload, "/upload/book")
 api.add_resource(Book, "/book/<string:filename>")
 
+docs.register(Collaborator)
 
 if __name__ == "__main__":
     db.init_app(app)
