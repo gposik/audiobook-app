@@ -24,7 +24,6 @@ from resources.task import Task, TaskList
 from resources.user import User, UserLogin, UserRegister, UserLogout, TokenRefresh
 from resources.confirmation import Confirmation, ConfirmationByUser
 from resources.audiobook import Audiobook, AudiobookList
-from resources.file import File
 from resources.book import BookUpload, Book
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -92,7 +91,6 @@ api.add_resource(
     "/task/<int:task_id>/subtask",
 )
 api.add_resource(TaskSubtaskList, "/task/<int:task_id>/subtasks")
-api.add_resource(File, "/upload-file", "/download-file")
 api.add_resource(BookUpload, "/upload/book")
 api.add_resource(Book, "/book/<string:filename>")
 
