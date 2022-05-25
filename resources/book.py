@@ -35,7 +35,7 @@ class BookUpload(Resource):
             basename = file_helper.get_basename(book_path)
             return {"message": gettext("book_uploaded").format(basename)}, 201
         except UploadNotAllowed:  # forbidden file type
-            return {"message": gettext("book_illegal_extension").format(extension)}, 400
+            return {"message": gettext("file_illegal_extension").format(extension)}, 400
 
 
 class Book(Resource):
@@ -46,7 +46,7 @@ class Book(Resource):
         """
         # check if filename is URL secure
         if not file_helper.is_filename_safe(filename):
-            return {"message": gettext("file_illegal_file_name").format(filename)}, 400
+            return {"message": gettext("file_illegal_filename").format(filename)}, 400
         try:
             # try to send the requested file to the user with status code 200
             return send_file(file_helper.path(filename))
@@ -61,7 +61,7 @@ class Book(Resource):
 
         # check if filename is URL secure
         if not file_helper.is_filename_safe(filename):
-            return {"message": gettext("file_illegal_file_name").format(filename)}, 400
+            return {"message": gettext("file_illegal_filename").format(filename)}, 400
 
         try:
             os.remove(file_helper.path(filename))

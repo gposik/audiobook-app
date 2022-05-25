@@ -3,12 +3,13 @@ import re
 from typing import Callable, Iterable, Optional, Union
 from flask import Flask
 from werkzeug.datastructures import FileStorage
-from flask_uploads import UploadSet, IMAGES, BOOKS, DEFAULTS
+from flask_uploads import UploadSet, IMAGES, BOOKS, AUDIO, DEFAULTS
 
 
-# UploadSet args <name>, <extensions>, <default_dest>
+# UploadSet predefine args: <name>, <extensions>, <default_dest>
 IMAGE_CONF = ("images", IMAGES)
 BOOK_CONF = ("books", BOOKS)
+AUDIO_CONF = ("audios", AUDIO)
 
 
 class FileHelper(UploadSet):

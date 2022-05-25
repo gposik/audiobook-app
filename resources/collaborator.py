@@ -1,10 +1,14 @@
+from db import db
+from uuid import uuid4
+
 from flask import request
 from flask_restful import Resource
 from flask_apispec import doc, marshal_with, use_kwargs
 from flask_apispec.views import MethodResource
-from pyparsing import col
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import exc
-from db import db
+from libs.file_helper import AUDIO_CONF, FileHelper
+
 from libs.strings import gettext
 from utils.api_utils import request_schemas_load
 from models.collaborator import CollaboratorModel
@@ -93,6 +97,30 @@ class CollaboratorSubtask(Resource):
         subtask.save_to_db()
 
         return {"message": gettext("collaborator_subtask_assigned")}, 200
+
+    @jwt_required()
+    def post(self):
+        user_id = get_jwt_identity()
+        user = UserModel.find_by_id(user_id)
+
+        collaborator = user.collaborator
+        if not collaborator:
+            return {"message": gettext("entity_not_found").format(RESOURCE_NAME)}, 404
+
+        subtask = collaborator.current_subtask
+        if not subtask:
+            return {"message": gettext("collaborator_subtask_not_found")}, 404
+
+        audio_file = subtask.audio_file
+        if audio_file:
+            return {
+                "message": gettext("subtask_has_audio_file").format(audio_file)
+            }, 400
+
+        subtask.audio_file = str(uuid4())
+        subtask.save_to_db()
+
+        return subtask_schema.dump(subtask), 200
 
 
 class CollaboratorHistory(Resource):

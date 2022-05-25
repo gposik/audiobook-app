@@ -10,7 +10,7 @@ class SubtaskSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = SubtaskModel
         exclude = ["creation_date", "modification_date", "expiration_date"]
-        dump_only = ("id",)
+        dump_only = ("id", "audio_file")
         load_only = ("task_id",)
         include_fk = True
         load_instance = True

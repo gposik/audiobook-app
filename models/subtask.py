@@ -13,6 +13,7 @@ class SubtaskModel(Timestamp, BaseModel):
     collaborator_id = db.Column(
         db.Integer, db.ForeignKey("collaborators.id"), nullable=True
     )
+    audio_file = db.Column(db.String(80), unique=True, nullable=True)
 
     def __repr__(self):
         return f"Subtask <id:{self.id}>"

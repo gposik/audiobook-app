@@ -12,7 +12,8 @@ from db import db
 from config import env_config
 from blacklist import BLACKLIST
 from errors import error_bp
-from libs.file_helper import IMAGE_CONF, BOOK_CONF, FileHelper
+from libs.file_helper import AUDIO_CONF, IMAGE_CONF, BOOK_CONF, FileHelper
+from resources.audio import AudioUpload
 from resources.collaborator import (
     Collaborator,
     CollaboratorHistory,
@@ -32,7 +33,9 @@ app = Flask(__name__)
 
 app.config.from_object(env_config["development"])
 
-configure_uploads(app, (FileHelper(*IMAGE_CONF), FileHelper(*BOOK_CONF)))
+configure_uploads(
+    app, (FileHelper(*IMAGE_CONF), FileHelper(*BOOK_CONF), FileHelper(*AUDIO_CONF))
+)
 app.register_blueprint(error_bp)
 
 api = Api(app)
@@ -79,6 +82,7 @@ api.add_resource(
     CollaboratorSubtask,
     "/collaborator/<int:collaborator_id>/subtask",
     "/collaborator/<int:collaborator_id>/subtask/<int:subtask_id>",
+    "/collaborator/subtask/audio",
 )
 api.add_resource(CollaboratorHistory, "/collaborator/<int:collaborator_id>/history")
 api.add_resource(Audiobook, "/audiobook/<int:audiobook_id>", "/audiobook")
@@ -93,6 +97,8 @@ api.add_resource(
 api.add_resource(TaskSubtaskList, "/task/<int:task_id>/subtasks")
 api.add_resource(BookUpload, "/upload/book")
 api.add_resource(Book, "/book/<string:filename>")
+api.add_resource(AudioUpload, "/upload/audio")
+
 
 docs.register(Collaborator)
 

@@ -19,7 +19,7 @@ class TaskModel(Timestamp, BaseModel):
         "AudiobookModel",
         backref=backref("task", uselist=False, cascade="all, delete-orphan"),
     )
-    subtasks = db.relationship("SubtaskModel")
+    subtasks = db.relationship("SubtaskModel", backref=backref("task", uselist=False))
     fragments_ranges = []
 
     def __repr__(self):

@@ -41,6 +41,7 @@ class DevelopmentConfig(Config):
     UPLOAD_FOLDER = os.path.join(basedir, "static/uploads/")
     UPLOADED_FILES_DEST = os.path.join(UPLOAD_FOLDER, "files")
     UPLOADED_IMAGES_DEST = os.path.join(UPLOAD_FOLDER, "images")
+    UPLOADED_AUDIOS_DEST = os.path.join(UPLOAD_FOLDER, "audios")
     UPLOADED_BOOKS_DEST = os.path.join(UPLOAD_FOLDER, "books")
     UPLOADED_BOOKS_ALLOW = ("mobi", "pdf", "epub")
 
