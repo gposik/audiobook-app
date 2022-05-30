@@ -1,6 +1,5 @@
 import traceback
 import os
-from uuid import uuid4
 
 from flask_restful import Resource
 from flask_uploads import UploadNotAllowed
@@ -27,28 +26,49 @@ class AudioUpload(Resource):
         query_params = audio_query_schema.load(request.args)
         name = query_params["name"]
 
-        # user
         user_id = get_jwt_identity()
-        user = UserModel.find_by_id(user_id)
-        folder = f"user_{user_id}"
+        user = UserModel.find_by_id_or_404(user_id)
+
         collaborator = user.collaborator
-        if collaborator:
-            subtask = collaborator.current_subtask
-            task = subtask.task
-            folder = os.path.join(folder, f"task_{task.id}", f"subtask_{subtask.id}")
+        if not collaborator:
+            return {"message": gettext("user_not_collaborator").format(user.id)}, 400
+
+        subtask = collaborator.current_subtask
+        if not subtask:
+            return {"message": gettext("collaborator_subtask_not_found")}, 404
+
+        task = subtask.task
+
+        folder = os.path.join(f"task_{task.id}", f"subtask_{subtask.id}")
 
         data = audio_schema.load(request.files)
         extension = file_helper.get_extension(data["audio"])
+
         try:
+            files_in_folder = file_helper.get_files(folder=folder)
+            print(files_in_folder)
+            current_file = next(iter(files_in_folder), None)
+
             audio_path = file_helper.save(
                 data["audio"], folder=folder, name=(name + extension)
             )
+
             basename = file_helper.get_basename(audio_path)
-            return {
+            message = {
                 "message": gettext("file_uploaded").format(RESOURCE_NAME, basename)
-            }, 201
-        except UploadNotAllowed:
+            }
+        except UploadNotAllowed as e:
+            print(e.messages)
             return {"message": gettext("file_illegal_extension").format(extension)}, 400
+        except:
+            traceback.print_exc()
+            return {"message": gettext("file_upload_failed")}, 500
+        else:
+            pass
+            # if current_file:
+            #     file_helper.remove_file(file=current_file, folder=folder)
+
+        return message, 201
 
 
 # class Audio(Resource):

@@ -16,6 +16,7 @@ from libs.file_helper import AUDIO_CONF, IMAGE_CONF, BOOK_CONF, FileHelper
 from resources.audio import AudioUpload
 from resources.collaborator import (
     Collaborator,
+    CollaboratorAudio,
     CollaboratorHistory,
     CollaboratorList,
     CollaboratorSubtask,
@@ -82,8 +83,8 @@ api.add_resource(
     CollaboratorSubtask,
     "/collaborator/<int:collaborator_id>/subtask",
     "/collaborator/<int:collaborator_id>/subtask/<int:subtask_id>",
-    "/collaborator/subtask/audio",
 )
+api.add_resource(CollaboratorAudio, "/collaborator/subtask/audio")
 api.add_resource(CollaboratorHistory, "/collaborator/<int:collaborator_id>/history")
 api.add_resource(Audiobook, "/audiobook/<int:audiobook_id>", "/audiobook")
 api.add_resource(AudiobookList, "/audiobooks")

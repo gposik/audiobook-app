@@ -98,6 +98,16 @@ class CollaboratorSubtask(Resource):
 
         return {"message": gettext("collaborator_subtask_assigned")}, 200
 
+
+class CollaboratorHistory(Resource):
+    @classmethod
+    def get(cls, collaborator_id: int):
+        collaborator = CollaboratorModel.find_by_id_or_404(collaborator_id)
+
+        return subtask_list_schema.dump(collaborator.subtasks), 200
+
+
+class CollaboratorAudio(Resource):
     @jwt_required()
     def post(self):
         user_id = get_jwt_identity()
@@ -121,11 +131,3 @@ class CollaboratorSubtask(Resource):
         subtask.save_to_db()
 
         return subtask_schema.dump(subtask), 200
-
-
-class CollaboratorHistory(Resource):
-    @classmethod
-    def get(cls, collaborator_id: int):
-        collaborator = CollaboratorModel.find_by_id_or_404(collaborator_id)
-
-        return subtask_list_schema.dump(collaborator.subtasks), 200

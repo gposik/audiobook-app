@@ -1,6 +1,6 @@
 import os
 import re
-from typing import Callable, Iterable, Optional, Union
+from typing import Callable, Iterable, Optional, Union, List
 from flask import Flask
 from werkzeug.datastructures import FileStorage
 from flask_uploads import UploadSet, IMAGES, BOOKS, AUDIO, DEFAULTS
@@ -37,6 +37,26 @@ class FileHelper(UploadSet):
             if os.path.isfile(file_path):
                 return file_path
         return None
+
+    def get_files(self, folder: str = None) -> List[str]:
+        """Given a relative folder find all files inside it"""
+
+        if folder is not None:
+            target_folder = os.path.join(self.config.destination, folder)
+        else:
+            target_folder = self.config.destination
+
+        file_list = []
+        if os.path.isdir(target_folder):
+            with os.scandir(target_folder) as it:
+                for entry in it:
+                    if entry.is_file():
+                        file_list.append(entry.name)
+        return file_list
+
+    def remove_file(self, file: str, folder: str = None) -> None:
+        file_path = self.path(filename=file, folder=folder)
+        os.remove(file_path)
 
     def _retrieve_filename(self, file: Union[str, FileStorage]) -> str:
         """
