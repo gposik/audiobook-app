@@ -45,9 +45,8 @@ class AudioUpload(Resource):
         extension = file_helper.get_extension(data["audio"])
 
         try:
-            files_in_folder = file_helper.get_files(folder=folder)
-            print(files_in_folder)
-            current_file = next(iter(files_in_folder), None)
+            # files_in_folder = file_helper.get_files(folder=folder)
+            # current_file = next(iter(files_in_folder), None)
 
             audio_path = file_helper.save(
                 data["audio"], folder=folder, name=(name + extension)
