@@ -3,7 +3,7 @@ import os
 
 from flask_restful import Resource
 from flask_uploads import UploadNotAllowed
-from flask import send_file, request
+from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from libs.file_helper import FileHelper, AUDIO_CONF
@@ -69,23 +69,6 @@ class AudioUpload(Resource):
 
         return message, 201
 
-
-# class Audio(Resource):
-#     @classmethod
-#     def get(cls, filename: str):
-#         """
-#         This endpoint returns the requested audio if exists.
-#         """
-#         # check if filename is URL secure
-#         if not file_helper.is_filename_safe(filename):
-#             return {"message": gettext("file_illegal_filename").format(filename)}, 400
-#         try:
-#             # try to send the requested file to the user with status code 200
-#             return send_file(file_helper.path(filename))
-#         except FileNotFoundError:
-#             return {
-#                 "message": gettext("file_not_found").format(RESOURCE_NAME, filename)
-#             }, 404
 
 #     @classmethod
 #     def delete(cls, filename: str):

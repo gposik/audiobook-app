@@ -1,17 +1,17 @@
 from io import StringIO
 from typing import List
 from db import db
+from sqlalchemy.orm import backref
+from sqlalchemy.ext.hybrid import hybrid_property
 from models.base import BaseModel
 from models.subtask import SubtaskModel
 from models.audiobook import AudiobookModel
 from models.timestamp import Timestamp
-from sqlalchemy.orm import backref
 
 
 class TaskModel(Timestamp, BaseModel):
     __tablename__ = "tasks"
 
-    is_completed = db.Column(db.Boolean, default=False)
     audiobook_id = db.Column(
         db.Integer, db.ForeignKey("audiobooks.id"), nullable=False, unique=True
     )
@@ -19,7 +19,10 @@ class TaskModel(Timestamp, BaseModel):
         "AudiobookModel",
         backref=backref("task", uselist=False, cascade="all, delete-orphan"),
     )
-    subtasks = db.relationship("SubtaskModel", backref=backref("task", uselist=False))
+    subtasks = db.relationship(
+        "SubtaskModel",
+        backref=backref("task", uselist=False),
+    )
     fragments_ranges = []
 
     def __repr__(self):
@@ -29,13 +32,18 @@ class TaskModel(Timestamp, BaseModel):
     def find_by_audiobook_id(cls, audiobook_id: int) -> "TaskModel":
         return cls.query.filter_by(audiobook_id=audiobook_id).first()
 
-    def get_available_subtasks(self) -> List["SubtaskModel"]:
-        return SubtaskModel.query.filter_by(is_completed=False, task_id=self.id).all()
+    @hybrid_property
+    def is_completed(self) -> bool:
+        return all(x.is_completed for x in self.subtasks)
+
+    @hybrid_property
+    def available_subtasks(self) -> List["SubtaskModel"]:
+        return [x for x in self.subtasks if x.collaborator_id is None]
 
     def get_subtask_by_id(self, subtask_id: int) -> "SubtaskModel":
         return next((x for x in self.subtasks if x.id == subtask_id), None)
 
-    def get_fragments_from_text(self, text: str):
+    def get_fragments_from_text(self, text: str) -> List[str]:
         fragments = []
 
         book_iter = StringIO(text)

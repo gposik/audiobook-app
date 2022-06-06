@@ -1,7 +1,5 @@
-from re import S
 import mobi
 import html2text
-import os
 
 from flask_restful import Resource
 from flask import request

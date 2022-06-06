@@ -33,7 +33,7 @@ class FragmentRangeSchema(Schema):
 class TaskSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = TaskModel
-        dump_only = ("id",)
+        dump_only = ("id", "is_completed")
         include_fk = True
         load_instance = True
 
@@ -44,6 +44,7 @@ class TaskSchema(ma.SQLAlchemyAutoSchema):
         load_only=True,
         validate=validate.Length(min=1),
     )
+    is_completed = fields.Boolean()
 
     @validates("fragments_ranges")
     def validate_fragments_ranges(self, fragments_ranges: list):

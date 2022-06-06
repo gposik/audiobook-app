@@ -3,10 +3,6 @@ from typing import List
 from requests import Response, post
 from libs.strings import gettext
 
-FAILED_LOAD_DOMAIN = "Failed to load domain."
-FAILED_LOAD_API_KEY = "Failed to load API key."
-ERROR_SENDING_EMAIL = "Error in sending email, please try again."
-
 
 class MailgunException(Exception):
     def __init__(self, message: str):
