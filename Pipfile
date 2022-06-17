@@ -10,6 +10,13 @@ flask-sqlalchemy = "*"
 marshmallow = "*"
 flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
+flask-jwt-extended = "*"
+mobi = "*"
+html2text = "*"
+requests = "*"
+python-dotenv = "*"
+flask-reuploaded = "*"
+flask-apispec = "==0.11.0"
 
 [dev-packages]
 black = "*"
