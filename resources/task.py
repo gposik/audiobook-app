@@ -1,5 +1,8 @@
+import traceback
+from marshmallow import ValidationError
 import mobi
 import html2text
+from db import db
 
 from flask_restful import Resource
 from flask import request
@@ -20,6 +23,8 @@ file_helper = FileHelper(*BOOK_CONF)
 
 
 def get_text_from_mobi_file(file_path: str):
+    if not file_path:
+        raise FileNotFoundError()
     tempdir, filepath = mobi.extract(file_path)
     with open(filepath, "r") as file:
         content = file.read()
@@ -58,6 +63,10 @@ class Task(Resource):
         except FileNotFoundError:
             task.delete_from_db()
             return {"message": gettext("book_not_found").format(filename)}, 404
+        except:
+            task.delete_from_db()
+            traceback.print_exc()
+            return {"message": gettext("unexpected_error")}, 500
 
         fragments = task.get_fragments_from_text(book_text)
 

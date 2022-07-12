@@ -31,8 +31,12 @@ class FragmentRangeSchema(Schema):
 
 
 class TaskSchema(ma.SQLAlchemyAutoSchema):
+    is_expired = fields.Bool()
+    is_finished = fields.Bool()
+
     class Meta:
         model = TaskModel
+        exclude = ["creation_date", "modification_date", "expiration_date"]
         dump_only = ("id", "is_completed")
         include_fk = True
         load_instance = True

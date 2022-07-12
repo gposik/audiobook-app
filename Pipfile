@@ -17,6 +17,7 @@ requests = "*"
 python-dotenv = "*"
 flask-reuploaded = "*"
 flask-apispec = "==0.11.0"
+pydub = "*"
 
 [dev-packages]
 black = "*"

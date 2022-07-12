@@ -23,6 +23,7 @@ class TaskModel(Timestamp, BaseModel):
         "SubtaskModel",
         backref=backref("task", uselist=False),
     )
+
     fragments_ranges = []
 
     def __repr__(self):
@@ -32,9 +33,35 @@ class TaskModel(Timestamp, BaseModel):
     def find_by_audiobook_id(cls, audiobook_id: int) -> "TaskModel":
         return cls.query.filter_by(audiobook_id=audiobook_id).first()
 
+    # @is_completed.expression
+    # def is_completed(cls) -> bool:
+    #     pass
+
+    # @classmethod
+    # def get_completed_tasks(cls) -> List["TaskModel"]:
+    #     return cls.query.filter_by(is_completed=True)
+
+    @classmethod
+    def get_completed_tasks(cls) -> List["TaskModel"]:
+        return [x for x in cls.find_all() if x.is_completed]
+
+    @classmethod
+    def get_to_be_finished_tasks(cls) -> List["TaskModel"]:
+        return [x for x in cls.find_all() if x.is_to_be_finished]
+
     @hybrid_property
     def is_completed(self) -> bool:
+        "Indicates whether all subtasks are completed or not"
         return all(x.is_completed for x in self.subtasks)
+
+    @hybrid_property
+    def is_finished(self) -> bool:
+        "Indicates wheter the task has the audiobook already generated or not"
+        return self.audiobook.audio_file is not None
+
+    @hybrid_property
+    def is_to_be_finished(self) -> bool:
+        return self.is_completed and not self.is_finished and not self.is_expired
 
     @hybrid_property
     def available_subtasks(self) -> List["SubtaskModel"]:

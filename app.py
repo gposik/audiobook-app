@@ -27,6 +27,7 @@ from resources.user import User, UserLogin, UserRegister, UserLogout, TokenRefre
 from resources.confirmation import Confirmation, ConfirmationByUser
 from resources.audiobook import Audiobook, AudiobookList
 from resources.book import BookUpload, Book
+from resources.make_task import MakeTask
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -99,7 +100,7 @@ api.add_resource(TaskSubtaskList, "/task/<int:task_id>/subtasks")
 api.add_resource(BookUpload, "/upload/book")
 api.add_resource(Book, "/book/<string:filename>")
 api.add_resource(AudioUpload, "/upload/audio")
-
+api.add_resource(MakeTask, "/make_tasks")
 
 docs.register(Collaborator)
 
