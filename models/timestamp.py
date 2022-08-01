@@ -5,7 +5,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 
 def tomorrows_date() -> "datetime":
-    return datetime.utcnow() + timedelta(days=1)
+    return datetime.utcnow() + timedelta(days=10)
 
 
 class Timestamp(object):

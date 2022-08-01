@@ -38,6 +38,10 @@ class FileHelper(UploadSet):
                 return file_path
         return None
 
+    @property
+    def destination(self):
+        return self.config.destination
+
     def get_files(self, folder: str = None) -> List[str]:
         """Given a relative folder find all files inside it"""
 

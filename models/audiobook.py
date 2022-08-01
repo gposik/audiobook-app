@@ -8,7 +8,7 @@ class AudiobookModel(BaseModel):
     name = db.Column(db.String(80), nullable=False, unique=True)
     author = db.Column(db.String(80), nullable=False)
     book_file = db.Column(db.String(80), unique=True)
-    audio_file = db.Column(db.LargeBinary, unique=True)
+    audio_file = db.Column(db.String(512), unique=True)
 
     def __repr__(self):
         return f"Audiobook named '{self.name}' from author '{self.author}'"

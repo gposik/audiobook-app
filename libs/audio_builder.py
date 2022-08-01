@@ -1,4 +1,7 @@
+from typing import List
 from pydub import AudioSegment
+
+FORMAT = "ogg"
 
 
 def detect_leading_silence(
@@ -20,3 +23,16 @@ def detect_leading_silence(
         trim_ms += chunk_size
 
     return trim_ms
+
+
+def concatenate_sounds(audio_paths: List[str]) -> AudioSegment:
+    """receives a list of audio paths and returns a unified AudioSegment"""
+    sound = AudioSegment.empty()
+    for path in audio_paths:
+        sound = AudioSegment.from_file(path, format=FORMAT)
+        start_trim = detect_leading_silence(sound)
+        end_trim = detect_leading_silence(sound.reverse())
+        duration = len(sound)
+        trimmed_sound = sound[start_trim : duration - end_trim]
+        sound += trimmed_sound
+    return sound
