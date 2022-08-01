@@ -34,13 +34,7 @@ class Audiobook(Resource):
                 )
             }, 400
 
-        last_audiobook = AudiobookModel.query.order_by(text("id desc")).first()
-        if last_audiobook:
-            new_id = last_audiobook.id + 1
-        else:
-            new_id = 1
-
-        audiobook.book_file = f"{new_id}-{str(uuid.uuid4())}"
+        audiobook.book_file = str(uuid.uuid4())
 
         audiobook.save_to_db()
 
@@ -48,6 +42,28 @@ class Audiobook(Resource):
             "message": gettext("entity_created").format(RESOURCE_NAME),
             "audiobook": audiobook_schema.dump(audiobook),
         }, 201
+
+    @classmethod
+    def put(cls, audiobook_id: int):
+        audiobook = AudiobookModel.find_by_id(audiobook_id)
+        audiobook_json = request.get_json()
+        new_audiobook = audiobook_schema.load(audiobook_json)
+
+        if audiobook:
+            audiobook.name = new_audiobook.name
+            audiobook.author = new_audiobook.author
+            response = {"message": "entity_updated", "code": 200}
+        else:
+            audiobook = new_audiobook
+            audiobook.book_file = str(uuid.uuid4())
+            response = {"message": "entity_created", "code": 201}
+
+        audiobook.save_to_db()
+
+        return {
+            "message": gettext(response["message"]).format(RESOURCE_NAME),
+            "audiobook": audiobook_schema.dump(audiobook),
+        }, response["code"]
 
     @classmethod
     def delete(cls, audiobook_id: int):

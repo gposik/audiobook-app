@@ -5,7 +5,7 @@ from db import db
 class AudiobookModel(BaseModel):
     __tablename__ = "audiobooks"
 
-    name = db.Column(db.String(80), nullable=False, unique=True)
+    name = db.Column(db.String(80), nullable=False)
     author = db.Column(db.String(80), nullable=False)
     book_file = db.Column(db.String(80), unique=True)
     audio_file = db.Column(db.String(512), unique=True)

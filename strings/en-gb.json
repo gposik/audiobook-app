@@ -11,6 +11,7 @@
   "collaborator_already_has_subtask": "The collaborator has an unfinished subtask with id <{}>",
   "collaborator_subtask_assigned": "The subtask was successfully assigned.",
   "entity_created": "{} created successfully.",
+  "entity_updated": "{} updated successfully",
   "entity_failed_to_create": "{} failed to create.",
   "entity_not_found": "{} not found.",
   "entity_deleted": "{} deleted.",
